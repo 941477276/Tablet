@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport">
+    <meta name="format-detection" content="telephone=no, email=no" />
+    <meta name="description" content="" />
+    <meta name="wap-font-scale" content="no"><!--uc浏览器判断到页面上文字居多时，会自动放大字体优化移动用户体验。这个可以禁止掉-->
+    <meta name="keywords" content="" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <meta name="apple-touch-fullscreen" content="yes"/><!-- 是否启用 WebApp 全屏模式，删除苹果默认的工具栏和菜单栏 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置苹果工具栏颜色:默认值为 default，可以定为 black和 black-translucent-->
+    <meta http-equiv="Cache-Control" content="no-siteapp" /><!-- 不让百度转码 -->
+    <meta name="HandheldFriendly" content="true"><!-- 针对手持设备优化，主要是针对一些老的不识别viewport的浏览器，比如黑莓 -->
+    <meta name="MobileOptimized" content="320"><!-- 微软的老式浏览器 -->
+    <meta name="screen-orientation" content="portrait"><!-- uc强制竖屏 -->
+    <meta name="x5-orientation" content="portrait"><!-- QQ强制竖屏 -->
+    <meta name="x5-page-mode" content="app"><!-- QQ应用模式 -->
+    <meta name="msapplication-tap-highlight" content="no"><!-- windows phone 点击无高光 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"><!-- ios 开启对web app程序的支持 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"><!-- ios 改变顶部状态条的颜色 -->
+    <title>canvas写字板</title>
+    <link rel="stylesheet" href="css/colpick.css" />
+    <style>
+        body,canvas{
+            /* height: 1000px; */
+            padding: 0;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        img{
+            display: block;
+            max-width: 100%;
+
+        }
+        *{
+            box-sizing: border-box; 
+            padding: 0;
+            margin: 0;
+        }
+        .container{
+            height: 600px;
+        }
+        .container .-tablet,
+        .container .-tablet-container,
+        .container .-canvas-wrapper{
+            height: 100%;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- <h1>canvas写字板</h1> -->
+
+    
+    <div class="container" id="container">
+       
+    </div>
+    <div style="height: 1200px;">
+        <img id="preview_img" style="position: absolute;" src="" alt="" />
+    </div>
+    
+    <!-- <div class="container">
+           <div class="-tablet-container">
+               <div class="tablet-btns">
+                   <input class="-color-picker" type="text" value="字体颜色" id="colpick" readonly />
+                   <input class="-color-picker" type="text" value="背景颜色" id="colpick2" readonly />
+                   <div class="clear-canvas">清屏</div>
+                   <div class="save-canvas-to-img">保存图片</div>
+               </div>
+               <div class="-canvas-wrapper">
+                   <canvas id="tablet_canvas"></canvas>    
+               </div>
+           </div>
+       </div> -->
+       <script type="text/html" id="temp">
+           <span>
+               画笔粗细
+               <select>
+                   <option value="1">1</option>
+                   <option value="3">3</option>
+                   <option value="5">5</option>
+                   <option value="8">8</option>
+                   <option value="10" selected>10</option>
+                   <option value="15">15</option>
+                   <option value="20">20</option>
+               </select>
+               <span class="save-canvas-to-img">
+                   保存图片
+               </span>
+               <select>
+                   <option value="0">正常</option>
+                   <option value="90">顺时针旋转90度</option>
+                   <option value="-90">逆时针旋转90度</option>
+                   <option value="180">旋转180度</option>
+               </select>
+               <span class="get_blob">获取blob对象</span>
+               <!-- <span class="download">预览图片</span> -->
+           </span>
+       </script>
+       
+       
+
+    <script src="jquery-1.12.4.min.js"></script>
+    <script src="dist/Tablet-1.0.min.js"></script>
+    <script>
+        var tablet;
+        $(function (){
+            tablet = new Tablet("#container",{
+                defaultColor: "#2e76da",
+                otherHtml: $("#temp").html(),
+                onInit: function (){
+                    var that = this,
+                        container = this.container;
+                    container.find("select").eq(0).on("change", function (){
+                        that.setLineWidth($(this).val());
+                    });
+                    container.find("select").eq(1).on("change", function (){
+                        that.rotate($(this).val());
+                    });
+                    container.find(".save-canvas-to-img").on("click", function (){
+                        console.log(that.getBase64());
+                        if(!that.isMobile){
+                            alert("请按f12打开控制台查看base64图片数据！");
+                        }
+                    });
+                    container.find(".get_blob").on("click", function (){
+                        that.getBlob();
+                    });
+                    /*container.find(".download").on("click", function (){
+                        document.getElementById("preview_img").src = that.getBase64();
+                    });*/
+                }
+            });
+            console.log(tablet);    
+        });        
+    </script>
+</body>
+</html>
