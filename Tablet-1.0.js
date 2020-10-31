@@ -97,8 +97,8 @@
     }
     this.container.append($(this.buildTablet()));
     this.tablet = $("#" + this.id);
-    this.$canvas = this.tablet.find("canvas");
-    this.canvas = this.tablet.find("canvas")[0];
+    this.$canvas = this.tablet.find("canvas").eq(0);
+    this.canvas = this.$canvas[0];
     this.ctx = this.canvas.getContext("2d");
     // 用于记录当前绘制的坐标
     this.point = {x: 0, y: 0};
@@ -167,7 +167,6 @@
           default:
         }
       },
-      clientRect = that.clientRect = that.canvas.getBoundingClientRect(),
       // 标记鼠标是否按钮或手指是否按下
       pressed = this.pressed = false,
       create = function (singal) {
@@ -180,12 +179,14 @@
           /* 如果鼠标刚按下(手指刚触摸)，或鼠标在移动中(手指在滑动中)则立即画线 */
           if (singal === 1 || that.pressed) {
             e = that.isMobile ? e.touches[0] : e;
+            var canvasScroll = that.$canvas.offset();
+            var scrollTop = $(document.documentElement).scrollTop();
+            var scrollLeft = $(document.documentElement).scrollLeft();
             // 设置坐标值 不加0.5，整数坐标处绘制直线，直线宽度将会多1px
-            that.point.x = e.clientX - that.clientRect.left + 0.5;
-            that.point.y = e.clientY - that.clientRect.top + 0.5;
+            that.point.x = e.clientX - ((canvasScroll.left + 0.5) - scrollLeft);
+            that.point.y = e.clientY - ((canvasScroll.top + 0.5) - scrollTop);
             that.points.x.push(that.point.x);
             that.points.y.push(that.point.y);
-            //console.log(that.point);
             pait(singal);
           }
         }
@@ -302,7 +303,6 @@
       this.width = width - bl - br;
       this.height = height - $tabletBtns.outerHeight() - bt - bb;
     }
-    that.clientRect = that.canvas.getBoundingClientRect();
     // 根据屏幕像素比优化canvas
     var devicePixelRatio = this.devicePixelRatio = window.devicePixelRatio;
     if (devicePixelRatio) {
@@ -326,7 +326,6 @@
     that.ctx.strokeStyle = that.lineConfig.strokeStyle;
     that.ctx.lineCap = that.lineConfig.lineCap;
     that.ctx.lineJoin = that.lineConfig.lineJoin;
-    that.clientRect = that.canvas.getBoundingClientRect();
     // 移动端性能太弱, 不适合模糊，去掉模糊可以提高手写渲染速度。pc端添加模糊为了去除锯齿
     if (!that.isMobile) {
       that.ctx.shadowBlur = that.lineConfig.shadowBlur;
