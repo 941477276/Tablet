@@ -77,27 +77,30 @@
              <option value="15">15</option>
              <option value="20">20</option>
          </select>
-         <span class="save-canvas-to-img">
-             保存图片
-         </span>
          <select>
              <option value="0">正常</option>
              <option value="90">顺时针旋转90度</option>
              <option value="-90">逆时针旋转90度</option>
              <option value="180">旋转180度</option>
          </select>
-         <span class="get_blob">获取blob对象</span>
+         <button type="button" class="get_blob">获取blob对象</button>
+         <button type="button" class="set-img">设置背景图片</button>
 <!-- <span class="download">预览图片</span> -->
      </span>
   </div>
 </div>
-<div class="container" id="container">
 
-</div>
+
+
+<div class="container" id="container"></div>
+
+
+
+
 <div style="height: 1200px;">
   <img id="preview_img" style="position: absolute;" src="" alt=""/>
 </div>
-
+<img src="./images/beijing1.png" id="bg_img" style="display: none;" alt="">
 
 <script src="jquery-1.12.4.min.js"></script>
 <!--<script src="dist/Tablet-1.0.min.js"></script>-->
@@ -108,7 +111,6 @@
   $(function () {
     tablet = new Tablet("#container", {
       defaultColor: "#2e76da",
-      // otherHtml: $("#temp").html(),
       onInit: function () {
         var that = this,
           container = this.container;
@@ -148,7 +150,8 @@
                   "border-color": color
                 }).colpickHide();
                 el.selectedColor = color;
-                that.bgColor = color;
+                //that.bgColor = color;
+                that.setBackgroundColor(color);
               }
             });
             $self.css({
@@ -174,9 +177,11 @@
         $(".get_blob").on("click", function () {
           console.log(that.getBlob());
         });
-        /*container.find(".download").on("click", function (){
-            document.getElementById("preview_img").src = that.getBase64();
-        });*/
+        $(".set-img").on("click", function () {
+          //console.log(that.getBlob());
+          // that.setBackgroundImage('./images/beijing1.png');
+          that.setBackgroundImage(document.getElementById('bg_img'));
+        });
       }
     });
     console.log(tablet);

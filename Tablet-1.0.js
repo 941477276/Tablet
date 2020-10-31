@@ -100,6 +100,10 @@
     this.$canvas = this.tablet.find("canvas").eq(0);
     this.canvas = this.$canvas[0];
     this.ctx = this.canvas.getContext("2d");
+    this.$canvasBack = this.tablet.find(".backup-canvas");
+    this.$canvasBack.hide();
+    this.canvasBack = this.$canvasBack[0];
+    this.ctxBack = this.canvasBack.getContext("2d");
     // 用于记录当前绘制的坐标
     this.point = {x: 0, y: 0};
     // 存储所有的x、y轴坐标，以获取最大及最小值
@@ -160,9 +164,13 @@
             /*如果是1，则表明是鼠标按下或是触摸开始，只要是鼠标按下或触摸开始则清楚之前绘制的路径，从按下的点重新开始*/
             that.ctx.beginPath();
             that.ctx.moveTo(that.point.x, that.point.y);
+            that.ctxBack.beginPath();
+            that.ctxBack.moveTo(that.point.x, that.point.y);
           case 2:
             that.ctx.lineTo(that.point.x, that.point.y);
             that.ctx.stroke();
+            that.ctxBack.lineTo(that.point.x, that.point.y);
+            that.ctxBack.stroke();
             break;
           default:
         }
@@ -190,15 +198,19 @@
             pait(singal);
           }
         }
-      }
-    that.ctx.lineWidth = that.lineConfig.lineWidth;
-    that.ctx.strokeStyle = that.lineConfig.strokeStyle;
-    that.ctx.lineCap = that.lineConfig.lineCap;
-    that.ctx.lineJoin = that.lineConfig.lineJoin;
+      };
+    var lineConfig = that.lineConfig;
+    // 设置画笔样式
+    for(var attr in lineConfig){
+      that.ctx[attr] = lineConfig[attr];
+      that.ctxBack[attr] = lineConfig[attr];
+    }
     // 移动端性能太弱, 不适合模糊，去掉模糊可以提高手写渲染速度。pc端添加模糊为了去除锯齿
     if (!that.isMobile) {
-      that.ctx.shadowBlur = that.lineConfig.shadowBlur;
-      that.ctx.shadowColor = that.lineConfig.shadowColor;
+      that.ctx.shadowBlur = lineConfig.shadowBlur;
+      that.ctx.shadowColor = lineConfig.shadowColor;
+      that.ctxBack.shadowBlur = lineConfig.shadowBlur;
+      that.ctxBack.shadowColor = lineConfig.shadowColor;
     }
     var start = create(1),
       move = create(2),
@@ -222,6 +234,25 @@
       });
     });
   }
+  /**
+   * 获取画布位置及宽高
+   * @returns {{x: number, width: number, y: number, height: number}}
+   */
+  Tablet.prototype.getRect = function(){
+    var w = this.width,
+        h = this.height;
+    if (this.degree == 90 || this.degree == -90) {
+      w = this.height;
+      h = this.width;
+    }
+    var offset = this.$canvas.offset();
+    return {
+      x: offset.left,
+      y: offset.top,
+      width: w,
+      height: h
+    }
+  }
   /*
       设置画笔颜色
       @param { color: string } 颜色值，可以是任何css的颜色表达式
@@ -235,9 +266,11 @@
     }
 
     that.ctx.strokeStyle = that.lineConfig.strokeStyle;
+    that.ctxBack.strokeStyle = that.lineConfig.strokeStyle;
     if (!that.isMobile) {
       that.lineConfig.shadowColor = color;
       that.ctx.shadowColor = that.lineConfig.shadowColor;
+      that.ctxBack.shadowColor = that.lineConfig.shadowColor;
     }
     return this;
   }
@@ -252,11 +285,72 @@
       return this;
     }
 
-    that.ctx.beginPath();
     that.lineConfig.lineWidth = number;
 
+    that.ctx.beginPath();
+    that.ctxBack.beginPath();
+
     that.ctx.lineWidth = that.lineConfig.lineWidth;
+    that.ctxBack.lineWidth = that.lineConfig.lineWidth;
     return this;
+  }
+  /**
+   * 设置背景颜色
+   * @param bgColor 颜色值
+   * @returns {Tablet}
+   */
+  Tablet.prototype.setBackgroundColor = function(bgColor){
+    this.bgColor = bgColor;
+    var canvasRect = this.getRect();
+    // 清除原先绘制的内容
+    this.ctx.clearRect(0, 0, canvasRect.width, canvasRect.height);
+    // 设置背景颜色
+    this.ctx.fillStyle = bgColor;
+    this.ctx.fillRect(0, 0, canvasRect.width, canvasRect.height);
+    // this.ctx.beginPath();
+    // 将原先绘制的内容绘制回去
+    this.ctx.drawImage(this.canvasBack, 0, 0);
+    return this;
+  }
+  Tablet.prototype.setBackgroundImage = function(img, x, y, width, height){
+    if(!img){
+      console.error('setBackgroundImage函数必须传递一个图片url地址或图片dom对象！');
+      return false;
+    }
+
+    var that = this;
+    var imgLoad = function () {
+      var canvasRect = that.getRect();
+      x = x || 0;
+      y = y || 0;
+      width = width || canvasRect.width;
+      height = height || canvasRect.height;
+      // 清除原先绘制的内容
+      that.ctx.clearRect(0, 0, canvasRect.width, canvasRect.height);
+      // 绘制图片
+      that.ctx.drawImage(img, x, y, width, height);
+      // 将原先绘制的内容绘制回去
+      that.ctx.drawImage(that.canvasBack, 0, 0);
+      console.log('图片绘制完成');
+    };
+    var imgLoadError = function () {
+      console.error('图片加载失败,不能进行绘制');
+    };
+    if(typeof img == 'string'){
+      var url = img;
+      img = new Image();
+      img.onload = imgLoad;
+      img.onerror = imgLoadError;
+      img.src = url;
+    }else{
+      // complete属性若为true，则表示图片已经加载完成
+      if(!img.complete){
+        img.onload = imgLoad;
+        img.onerror = imgLoadError;
+      }else{
+        imgLoad();
+      }
+    }
   }
   /*
       设置canvas的宽高
@@ -308,12 +402,19 @@
     if (devicePixelRatio) {
       this.$canvas.width(this.width);
       this.$canvas.height(this.height);
+      this.$canvasBack.width(this.width);
+      this.$canvasBack.height(this.height);
       this.canvas.width = this.width * devicePixelRatio;
       this.canvas.height = this.height * devicePixelRatio;
+      this.canvasBack.width = this.width * devicePixelRatio;
+      this.canvasBack.height = this.height * devicePixelRatio;
       this.ctx.scale(devicePixelRatio, devicePixelRatio);
+      this.ctxBack.scale(devicePixelRatio, devicePixelRatio);
     } else {
       this.canvas.width = this.width;
       this.canvas.height = this.height;
+      this.canvasBack.width = this.width;
+      this.canvasBack.height = this.height;
     }
     return this;
   }
@@ -358,6 +459,7 @@
       h = this.width;
     }
     this.ctx.clearRect(0, 0, w, h);
+    this.ctxBack.clearRect(0, 0, w, h);
     this.points = {
       x: [],
       y: [],
@@ -421,7 +523,8 @@
       winH = $(window).height(),
       w = winW,
       h = winH,
-      newCanvas = $('<canvas>');
+      newCanvas = $('<canvas>'),
+      newCanvasBack = $('<canvas class="backup-canvas">');
     degree = ~~degree;
     if (degree < minDeg) {
       degree = minDeg;
@@ -435,6 +538,8 @@
     // 旋转后把原来的canvas干掉，然后替换成新的
     this.tablet.find("canvas").remove();
     this.tablet.find(".-canvas-wrapper").append(newCanvas);
+    this.tablet.find(".-canvas-wrapper").append(newCanvasBack);
+    newCanvasBack.hide();
 
     translateLen = (winH - winW) / 2;
     switch (degree) {
@@ -468,6 +573,9 @@
     this.$canvas = this.tablet.find("canvas").eq(0);
     this.canvas = this.$canvas[0];
     this.ctx = this.canvas.getContext("2d");
+    this.$canvasBack = this.tablet.find(".backup-canvas").eq(0);
+    this.canvasBack = this.$canvasBack[0];
+    this.ctxBack = this.canvasBack.getContext("2d");
     // 重新初始化ctx
     this._ctxInit();
     // 重新计算宽高
@@ -482,13 +590,16 @@
         break;
       case -90:
         this.ctx.translate(0, -this.width);
+        this.ctxBack.translate(0, -this.width);
         break;
       case 90:
         this.ctx.translate(-this.height, 0);
+        this.ctxBack.translate(-this.height, 0);
         break;
       case -180:
       case 180:
         this.ctx.translate(-this.width, -this.height);
+        this.ctxBack.translate(-this.width, -this.height);
         break;
       default:
     }
@@ -522,6 +633,7 @@
     }*/
     html += '    <div class="-canvas-wrapper">';
     html += '        <canvas></canvas>';
+    html += '        <canvas class="backup-canvas"></canvas>';
     html += '    </div>';
     html += '</div>';
     html += '</div>';
@@ -549,6 +661,17 @@
     obj.top = Math.min.apply(null, yPoints);
     obj.bottom = Math.max.apply(null, yPoints);
     return obj;
+  }
+
+  Tablet.prototype.destroy = function () {
+    this.canvas = null;
+    this.$canvas = null;
+    this.ctx = null;
+    this.canvasBack = null;
+    this.$canvasBack = null;
+    this.ctxBack = null;
+    this.table = null;
+    this.container = null;
   }
 
   //window.Tablet = Tablet;
