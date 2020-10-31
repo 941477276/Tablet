@@ -1,5 +1,5 @@
 # Tablet
-Tablet是一个基于canvas的在线签名板！
+Tablet是一个基于canvas的在线画板，依赖jQuery！兼容各种移动设备！
 <h1>canvas签名板文档</h1>
   <h2>基本使用</h2>
   <pre>
