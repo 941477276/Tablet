@@ -3,80 +3,72 @@ Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他�
 <h1>canvas签名板文档</h1>
   <h2>基本使用</h2>
   <pre>
-      <code class="javascript">
-  　　　　&lt;div id="my_tablet"&gt;&lt;/div&gt;
-          &lt;script type="text/html" id="temp"&gt;
-             &lt;span&gt;
-                 画笔粗细
-                 &lt;select&gt;
-                     &lt;option value="1"&gt;1&lt;/option&gt;
-                     &lt;option value="3"&gt;3&lt;/option&gt;
-                     &lt;option value="5"&gt;5&lt;/option&gt;
-                     &lt;option value="8"&gt;8&lt;/option&gt;
-                     &lt;option value="10" selected&gt;10&lt;/option&gt;
-                     &lt;option value="15"&gt;15&lt;/option&gt;
-                     &lt;option value="20"&gt;20&lt;/option&gt;
-                 &lt;/select&gt;
-                 &lt;span class="save-canvas-to-img"&gt;
-                     保存图片
-                 &lt;/span&gt;
-                 &lt;select&gt;
-                     &lt;option value="0"&gt;正常&lt;/option&gt;
-                     &lt;option value="90"&gt;顺时针旋转90度&lt;/option&gt;
-                     &lt;option value="-90"&gt;逆时针旋转90度&lt;/option&gt;
-                     &lt;option value="180"&gt;旋转180度&lt;/option&gt;
-                 &lt;/select&gt;
-                 &lt;span class="get_blob"&gt;获取blob对象&lt;/span&gt;
-             &lt;/span&gt;
-         &lt;/script&gt;
-         &lt;script&gt;
-            var tablet = new Tablet("#my_tablet",{
-              // 默认字体颜色
-              defaultColor: "#2e76da",
-              // 是否允许选择字体颜色
-              selectColor: true,
-              /* canvas画布是否响应式，默认为true。当设置为响应式后浏览器大小改变后会重新计算canvas画布的宽高，
-              并且之前绘制的内容会被清除掉（canvas的一个特性）*/
-              response: true,
-              // canvas的宽度，宽度可以传递函数。不传宽度默认为canvas的父元素的宽度
-              width: 0,
-              // canvas的宽度，高度可以传递函数。不传宽度默认为canvas的父元素的高度
-              height: 0,
-              // 签名板的额外class
-              extraClass: "",
-              // 清屏按钮的innerHTML
-              clearBtnHtml: "",
-              // 保存图片的innerHTML
-              saveBtnHtml: "",
-              // 工具栏中额外的html（可以实现一些自定义功能）
-              otherHtml: $("#temp").html(),
-              // tablet初始化后执行的函数（此时canvas上下文并未初始化）
-              onInit: function (){
-                  var that = this,
-                      container = this.container;
-                  container.find("select").eq(0).on("change", function (){
-                      that.setLineWidth($(this).val());
-                  });
-                  container.find("select").eq(1).on("change", function (){
-                      that.rotate($(this).val());
-                  });
-                  container.find(".save-canvas-to-img").on("click", function (){
-                      that.getBase64();
-                  });
-                  container.find(".get_blob").on("click", function (){
-                      that.getBlob();
-                  });
-                  /*container.find(".download").on("click", function (){
-                      document.getElementById("preview_img").src = that.getBase64();
-                  });*/
-              },
-              // 清除画布前执行的函数，如果该函数返回false，则不会进行清除
-              onBeforeClear: function() {},
-              // 清除画布后执行的函数
-              onClear: function() {}
+<code class="javascript">
+　&lt;div id="my_tablet"&gt;&lt;/div&gt;
+  &lt;script type="text/html" id="temp"&gt;
+     &lt;span&gt;
+         画笔粗细
+         &lt;select&gt;
+             &lt;option value="1"&gt;1&lt;/option&gt;
+             &lt;option value="3"&gt;3&lt;/option&gt;
+             &lt;option value="5"&gt;5&lt;/option&gt;
+             &lt;option value="8"&gt;8&lt;/option&gt;
+             &lt;option value="10" selected&gt;10&lt;/option&gt;
+             &lt;option value="15"&gt;15&lt;/option&gt;
+             &lt;option value="20"&gt;20&lt;/option&gt;
+         &lt;/select&gt;
+         &lt;span class="save-canvas-to-img"&gt;
+             保存图片
+         &lt;/span&gt;
+         &lt;select&gt;
+             &lt;option value="0"&gt;正常&lt;/option&gt;
+             &lt;option value="90"&gt;顺时针旋转90度&lt;/option&gt;
+             &lt;option value="-90"&gt;逆时针旋转90度&lt;/option&gt;
+             &lt;option value="180"&gt;旋转180度&lt;/option&gt;
+         &lt;/select&gt;
+         &lt;span class="get_blob"&gt;获取blob对象&lt;/span&gt;
+     &lt;/span&gt;
+ &lt;/script&gt;
+ &lt;script&gt;
+    var tablet = new Tablet("#my_tablet",{
+      // 默认字体颜色
+      defaultColor: "#2e76da",
+      /* canvas画布是否响应式，默认为true。当设置为响应式后浏览器大小改变后会重新计算canvas画布的宽高，
+      并且之前绘制的内容会被清除掉（canvas的一个特性）*/
+      response: true,
+      // canvas的宽度，宽度可以传递函数。不传宽度默认为canvas的父元素的宽度
+      width: 0,
+      // canvas的宽度，高度可以传递函数。不传宽度默认为canvas的父元素的高度
+      height: 0,
+      // 签名板的额外class
+      extraClass: "",
+      // tablet初始化后执行的函数（此时canvas上下文并未初始化）
+      onInit: function (){
+          var that = this,
+              container = this.container;
+          container.find("select").eq(0).on("change", function (){
+              that.setLineWidth($(this).val());
           });
-        &lt;/script&gt;
-      </code>
+          container.find("select").eq(1).on("change", function (){
+              that.rotate($(this).val());
+          });
+          container.find(".save-canvas-to-img").on("click", function (){
+              that.getBase64();
+          });
+          container.find(".get_blob").on("click", function (){
+              that.getBlob();
+          });
+          /*container.find(".download").on("click", function (){
+              document.getElementById("preview_img").src = that.getBase64();
+          });*/
+      },
+      // 清除画布前执行的函数，如果该函数返回false，则不会进行清除
+      onBeforeClear: function() {},
+      // 清除画布后执行的函数
+      onClear: function() {}
+  });
+&lt;/script&gt;
+</code>
   </pre>
   <p>效果如图：</p>
   <img src="images/tablet.png" alt="" />
@@ -134,7 +126,25 @@ Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他�
   <p class="pl-30">
     <code>setLineWidth(width)</code>设置canvas画笔的粗细。<code>width</code>为画笔粗细，pc端默认为8，移动端根据屏幕大小自动判断
   </p>
-  
+  <blockquote>
+     <span class="font-26">setBackgroundColor</span>
+  </blockquote>
+  <p class="pl-30">
+    <code>setBackgroundColor(color)</code>设置画布背景颜色。<code>color</code>为画布颜色
+  </p>
+  <blockquote>
+    <span class="font-26">setBackgroundImage</span>
+  </blockquote>
+  <p class="pl-30">
+     <code>setBackgroundImage(img, x, y, width, height)</code>设置画布背景图片。
+     <ul>
+        <li><code>img</code>为图片url地址或一个img dom对象（必填）</li>
+        <li><code>x</code>为绘制起始x点（非必填）</li>
+        <li><code>y</code>为绘制起始y点（非必填）</li>
+        <li><code>width</code>为绘制的宽度（非必填）</li>
+        <li><code>height</code>为绘制的高度（非必填）</li>
+    </ul>
+  </p>
 
   <br />
   <h2>实例属性</h2>

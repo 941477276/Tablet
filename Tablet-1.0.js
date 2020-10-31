@@ -55,11 +55,11 @@
       // 前面板的额外class
       extraClass: "",
       // 清屏按钮的innerHTML
-      clearBtnHtml: "",
+      // clearBtnHtml: "",
       // 保存图片的innerHTML
-      saveBtnHtml: "",
+      // saveBtnHtml: "",
       // 需要添加到工具栏中的其他内容
-      otherHtml: "",
+      // otherHtml: "",
       // 默认字体颜色
       defaultColor: "#000",
       // 默认背景色
@@ -487,10 +487,10 @@
   }
   /**
    * 获取图片的base64数据
-   * @param {type: string} 图片的MIME类型
+   * @param {type: string} 生成的图片格式，只有png、jpg两个选项
    * @returns {string}
    */
-  Tablet.prototype.getBase64 = function (imageMIME) {
+  Tablet.prototype.getBase64 = function (type) {
     var that = this,
       position = Tablet.getMax(this.points.x, this.points.y);
     if (!type) {
@@ -508,7 +508,7 @@
   }
   /**
    * 获取图片的二进制数据
-   * @param {type: string} 图片的MIME类型
+   * @param {type: string} 图片的后缀
    * @returns {Blob}
    */
   Tablet.prototype.getBlob = function (type) {
