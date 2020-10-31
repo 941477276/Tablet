@@ -1,5 +1,5 @@
 # Tablet
-Tablet是一个基于canvas的在线画板，依赖jQuery！兼容各种移动设备！
+Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他依赖，`传统网站`或`vue`、`react`、`angular`等单页面应用皆可使用！兼容各种移动设备！
 <h1>canvas签名板文档</h1>
   <h2>基本使用</h2>
   <pre>
