@@ -386,7 +386,6 @@
       bl = parseFloat(this.$canvas.css("border-left-width"), 10),
       br = parseFloat(this.$canvas.css("border-right-width"), 10);
 
-    // 如果没有传递高度，则默认高度为.-tablet-container 的高度减去工具栏的高度
     if (!width || !height) {
       var _w = 0,
         _h = 0,
@@ -394,7 +393,7 @@
       if (!that.isMobile) {
         _w = $canvasParent.width();
         // canvas的高度要减去工具栏的高度
-        _h = $canvasParent.height() - $tabletBtns.outerHeight();
+        _h = $canvasParent.height();
       } else {
         var winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
         _w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -407,8 +406,7 @@
       }
 
       this.width = _w - bl - br;
-      // $tabletBtns.outerHeight()的高度为工具栏的高度，它的高度只有在.-tablet-container的宽度设置好后才能正确获取
-      this.height = _h - $tabletBtns.outerHeight() - bt - bb;
+      this.height = _h - bt - bb;
     } else {
       this.tablet.children(".-tablet-container").css({
         width: width,
@@ -416,7 +414,7 @@
       });
 
       this.width = width - bl - br;
-      this.height = height - $tabletBtns.outerHeight() - bt - bb;
+      this.height = height - bt - bb;
     }
     // 根据屏幕像素比优化canvas
     var devicePixelRatio = this.devicePixelRatio = window.devicePixelRatio;
@@ -445,14 +443,17 @@
    */
   Tablet.prototype.canvasReset = function () {
     var that = this;
-    that.ctx.lineWidth = that.lineConfig.lineWidth;
-    that.ctx.strokeStyle = that.lineConfig.strokeStyle;
-    that.ctx.lineCap = that.lineConfig.lineCap;
-    that.ctx.lineJoin = that.lineConfig.lineJoin;
+    var lineConfig = this.lineConfig;
+    for(var attr in lineConfig){
+      that.ctx[attr] = lineConfig[attr];
+      that.ctxBack[attr] = lineConfig[attr];
+    }
     // 移动端性能太弱, 不适合模糊，去掉模糊可以提高手写渲染速度。pc端添加模糊为了去除锯齿
     if (!that.isMobile) {
-      that.ctx.shadowBlur = that.lineConfig.shadowBlur;
-      that.ctx.shadowColor = that.lineConfig.shadowColor;
+      that.ctx.shadowBlur = lineConfig.shadowBlur;
+      that.ctx.shadowColor = lineConfig.shadowColor;
+      that.ctxBack.shadowBlur = lineConfig.shadowBlur;
+      that.ctxBack.shadowColor = lineConfig.shadowColor;
     }
     this.points = {
       x: [],
