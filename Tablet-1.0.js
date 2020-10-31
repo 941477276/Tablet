@@ -253,10 +253,11 @@
       height: h
     }
   }
-  /*
-      设置画笔颜色
-      @param { color: string } 颜色值，可以是任何css的颜色表达式
-  */
+  /**
+   * 设置画笔颜色
+   * @param color 颜色值，可以是任何css的颜色表达式
+   * @returns {Tablet}
+   */
   Tablet.prototype.setColor = function (color) {
     var that = this;
     that.ctx.beginPath();
@@ -274,10 +275,11 @@
     }
     return this;
   }
-  /*
-      设置画笔粗细
-      @param { lineWidth: number } 画笔的粗细，必须是一个数值
-  */
+  /**
+   * 设置画笔粗细
+   * @param number 画笔的粗细，必须是一个数值
+   * @returns {Tablet}
+   */
   Tablet.prototype.setLineWidth = function (number) {
     var that = this;
     number = parseFloat(number);
@@ -312,6 +314,15 @@
     this.ctx.drawImage(this.canvasBack, 0, 0);
     return this;
   }
+  /**
+   * 设置背景图片
+   * @param {img: dom|url} img dom对象或图片地址
+   * @param {x: number} 绘制起始x点
+   * @param {y: number} 绘制起始y点
+   * @param {width: number} 绘制的宽度
+   * @param {height: number} 绘制的高度
+   * @returns {boolean}
+   */
   Tablet.prototype.setBackgroundImage = function(img, x, y, width, height){
     if(!img){
       console.error('setBackgroundImage函数必须传递一个图片url地址或图片dom对象！');
@@ -352,11 +363,12 @@
       }
     }
   }
-  /*
-      设置canvas的宽高
-      @param { width: number } canvas的宽度
-      @param { height: number } canvas的高度
-  */
+  /**
+   * 设置canvas的宽高
+   * @param { width: number } canvas的宽度
+   * @param { height: number } canvas的高度
+   * @returns {Tablet}
+   */
   Tablet.prototype.setCanvasWH = function (width, height) {
     var that = this,
       $tabletBtns = this.tablet.find('.tablet-btns'),
@@ -418,9 +430,10 @@
     }
     return this;
   }
-  /*
-      canvas重置。重置时会使用最后一次的属性进行重置
-  */
+  /**
+   * canvas重置。重置时会使用最后一次的属性进行重置
+   * @returns {Tablet}
+   */
   Tablet.prototype.canvasReset = function () {
     var that = this;
     that.ctx.lineWidth = that.lineConfig.lineWidth;
@@ -442,9 +455,10 @@
     }
     return this;
   }
-  /*
-      清屏
-  */
+  /**
+   * 清屏
+   * @returns {Tablet}
+   */
   Tablet.prototype.clear = function () {
     var w = this.width,
       h = this.height;
@@ -471,10 +485,12 @@
     this.config.onClear && (typeof this.config.onClear === "function") && this.config.onClear.call(this);
     return this;
   }
-  /*
-      获取图片的base64数据
-  */
-  Tablet.prototype.getBase64 = function (type) {
+  /**
+   * 获取图片的base64数据
+   * @param {type: string} 图片的MIME类型
+   * @returns {string}
+   */
+  Tablet.prototype.getBase64 = function (imageMIME) {
     var that = this,
       position = Tablet.getMax(this.points.x, this.points.y);
     if (!type) {
@@ -490,9 +506,11 @@
     var base64Img = this.canvas.toDataURL(type, 1);
     return base64Img;
   }
-  /*
-      获取图片的二进制数据
-  */
+  /**
+   * 获取图片的二进制数据
+   * @param {type: string} 图片的MIME类型
+   * @returns {Blob}
+   */
   Tablet.prototype.getBlob = function (type) {
     var that = this,
       base64Img = this.getBase64(type),
@@ -507,10 +525,10 @@
     }
     return new Blob([u8arr], {type: mime});
   }
-  /*
-      旋转画布
-      @param { degree: number } 旋转的角度
-  */
+  /**
+   * 旋转画布
+   * @param { degree: number } 旋转的角度
+   */
   Tablet.prototype.rotate = function (degree) {
     var minDeg = -90,
       maxDeg = 180,
@@ -640,12 +658,12 @@
     //html += '</div>';
     return html;
   }
-
-  /*
-      获取x、y轴的最大、最小值，并返回一个对象
-      @param { xPoints: array } x轴的所有坐标点
-      @param { yPoints: array } y轴的所有坐标点
-  */
+  /**
+   *  获取x、y轴的最大、最小值，并返回一个对象
+   * @param { xPoints: array } x轴的所有坐标点
+   * @param { yPoints: array } y轴的所有坐标点
+   * @returns {{top: number, left: number, bottom: number, right: number}}
+   */
   Tablet.getMax = function (xPoints, yPoints) {
     var obj = {
       left: 0,
@@ -662,7 +680,9 @@
     obj.bottom = Math.max.apply(null, yPoints);
     return obj;
   }
-
+  /**
+   * 销毁画布
+   */
   Tablet.prototype.destroy = function () {
     this.canvas = null;
     this.$canvas = null;
