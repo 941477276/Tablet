@@ -1,6 +1,7 @@
 /*!
 * Tablet
 * Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他依赖，传统网站或vue、react、angular等单页面应用皆可使用！兼容各种移动设备！
+* github: https://github.com/941477276/Tablet
 */
 (function (factory) {
   if (typeof define === "function" && define.amd) {

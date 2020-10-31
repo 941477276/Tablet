@@ -71,7 +71,9 @@ Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他�
 </code>
   </pre>
   <p>效果如图：</p>
-  <img src="images/tablet.png" alt="" />
+  
+  ![Table画板效果](./images/tablet-effect.gif)
+  
   <div class="pt-20"></div>
 
   <h2>实例方法</h2>
