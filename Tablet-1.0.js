@@ -83,7 +83,7 @@
         this.point = {x: 0, y: 0};
         // 存储所有的x、y轴坐标，以获取最大及最小值
         this.points = {
-            x: [], 
+            x: [],
             y: [],
             left: 0,
             right: 0,
@@ -113,7 +113,7 @@
 
                             that.setColor(color);
                         }
-                    }); 
+                    });
                     $self.css({
                         "border-color": that.config.defaultColor
                     });
@@ -131,7 +131,7 @@
                             el.selectedColor = color;
                             that.bgColor = color;
                         }
-                    }); 
+                    });
                      $self.css({
                         "border-color": that.config.defaultBackgroundColor
                     });
@@ -145,9 +145,9 @@
             this.width = this.config.width;
         }
         if(typeof this.config.height === "function"){
-            this.width = this.config.height();
+            this.height = this.config.height();
         }else{
-            this.width = this.config.height;
+            this.height = this.config.height;
         }
 
         // 设置canvas画布的宽高
@@ -172,7 +172,7 @@
                 that.lineConfig.lineWidth = 2;
             }
         }
-        
+
         this.config.onInit && (typeof this.config.onInit === "function") && this.config.onInit.call(this);
     }
     /* 内部使用，给canvas进行一些初始化设置 */
@@ -250,14 +250,14 @@
     Tablet.prototype._bindEvent = function (){
         var that = this;
         this.tablet.find(".clear-canvas").on("click", function (){
-            if (that.config.onBeforeClear && (typeof that.config.onBeforeClear === "function")){
+           /* if (that.config.onBeforeClear && (typeof that.config.onBeforeClear === "function")){
                 var flag = that.config.onBeforeClear.call(this);
                 if(flag === false){
                     return;
-                }       
-            }
+                }
+            }*/
             that.clear();
-            that.config.onBeforeClear && (typeof that.config.onBeforeClear === "function") && that.config.onBeforeClear.call(this);
+            // that.config.onBeforeClear && (typeof that.config.onBeforeClear === "function") && that.config.onBeforeClear.call(this);
         });
     }
     /*
@@ -350,7 +350,7 @@
             this.ctx.scale(devicePixelRatio, devicePixelRatio);
         }else{
             this.canvas.width = this.width;
-            this.canvas.height = this.height;  
+            this.canvas.height = this.height;
         }
         return this;
     }
@@ -370,7 +370,7 @@
             that.ctx.shadowColor = that.lineConfig.shadowColor;
         }
         this.points = {
-            x: [], 
+            x: [],
             y: [],
             left: 0,
             right: 0,
@@ -385,19 +385,26 @@
     Tablet.prototype.clear = function (){
         var w = this.width,
             h = this.height;
+        if (this.config.onBeforeClear && (typeof this.config.onBeforeClear === "function")){
+            var flag = this.config.onBeforeClear.call(this);
+            if(flag === false){
+                return;
+            }
+        }
         if(this.degree == 90 || this.degree == -90){
             w = this.height;
             h = this.width;
         }
         this.ctx.clearRect(0, 0, w, h);
         this.points = {
-            x: [], 
+            x: [],
             y: [],
             left: 0,
             right: 0,
             top: 0,
             bottom: 0
         }
+        this.config.onClear && (typeof this.config.onClear === "function") && this.config.onClear.call(this);
         return this;
     }
     /*
@@ -539,7 +546,7 @@
             html += '    <div class="tablet-btns">';
             if(this.config.selectColor){
                 html += '   <input class="-color-picker color-color" type="text" value="字体色" readonly />';
-               // html += '   <input class="-color-picker bg-color" type="text" value="背景色(无)" readonly />';  
+               // html += '   <input class="-color-picker bg-color" type="text" value="背景色(无)" readonly />';
             }
             html += '        <div class="clear-canvas">';
             html += this.config.clearBtnHtml ? this.config.clearBtnHtml : '清屏';
@@ -561,7 +568,7 @@
         //html += '</div>';
         return html;
     }
-    
+
     /*
         获取x、y轴的最大、最小值，并返回一个对象
         @param { xPoints: array } x轴的所有坐标点
