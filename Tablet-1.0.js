@@ -213,6 +213,9 @@
       that.ctxBack.shadowBlur = lineConfig.shadowBlur;
       that.ctxBack.shadowColor = lineConfig.shadowColor;
     }
+
+    this.setBackgroundColor(this.config.defaultBackgrondColor);
+
     var start = create(1),
       move = create(2),
       // 为了避免UI过度绘制，让move操作执行得更加流畅，因此使用requestAnimationFrame优化
@@ -307,12 +310,17 @@
     var canvasRect = this.getRect();
     // 清除原先绘制的内容
     this.ctx.clearRect(0, 0, canvasRect.width, canvasRect.height);
-    // 设置背景颜色
-    this.ctx.fillStyle = bgColor;
-    this.ctx.fillRect(0, 0, canvasRect.width, canvasRect.height);
+    if(bgColor != 'transparent'){
+      // 设置背景颜色
+      this.ctx.fillStyle = bgColor;
+      this.ctx.fillRect(0, 0, canvasRect.width, canvasRect.height);
+    }
+
     // this.ctx.beginPath();
-    // 将原先绘制的内容绘制回去
-    this.ctx.drawImage(this.canvasBack, 0, 0);
+    if(this.points.x.length > 0 || this.points.y.length > 0){
+      // 将原先绘制的内容绘制回去
+      this.ctx.drawImage(this.canvasBack, 0, 0);
+    }
     return this;
   }
   /**
@@ -454,6 +462,8 @@
       top: 0,
       bottom: 0
     }
+    this.point.x = 0;
+    this.point.y = 0;
     return this;
   }
   /**
