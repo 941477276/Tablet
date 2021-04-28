@@ -1,181 +1,234 @@
 # Tablet
 Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他依赖，`传统网站`或`vue`、`react`、`angular`等单页面应用皆可使用！兼容各种移动设备！
 <h1>canvas签名板文档</h1>
-  <h2>基本使用</h2>
-  <pre>
-<code class="javascript">
-　&lt;div id="my_tablet"&gt;&lt;/div&gt;
-  &lt;script type="text/html" id="temp"&gt;
-     &lt;span&gt;
+这是<code>Tablet2.0</code>文档，Tablet1.0文档请前往 
+
+[Tablet1.0文档](https://github.com/941477276/Tablet/blob/master/README.md)
+
+## 基本使用
+
+```
+<div class="tool-bar">
+  <div class="tablet-btns" style="padding: 10px;">
+    <input class="-color-picker color-color" type="text" value="字体颜色" id="colpick" readonly/>
+    <input class="-color-picker bg-color" type="text" value="背景颜色" id="colpick2" readonly/>
+    <div class="clear-canvas">清屏</div>
+    <div class="save-canvas-to-img">保存图片</div>
+    <span>
          画笔粗细
-         &lt;select&gt;
-             &lt;option value="1"&gt;1&lt;/option&gt;
-             &lt;option value="3"&gt;3&lt;/option&gt;
-             &lt;option value="5"&gt;5&lt;/option&gt;
-             &lt;option value="8"&gt;8&lt;/option&gt;
-             &lt;option value="10" selected&gt;10&lt;/option&gt;
-             &lt;option value="15"&gt;15&lt;/option&gt;
-             &lt;option value="20"&gt;20&lt;/option&gt;
-         &lt;/select&gt;
-         &lt;span class="save-canvas-to-img"&gt;
-             保存图片
-         &lt;/span&gt;
-         &lt;select&gt;
-             &lt;option value="0"&gt;正常&lt;/option&gt;
-             &lt;option value="90"&gt;顺时针旋转90度&lt;/option&gt;
-             &lt;option value="-90"&gt;逆时针旋转90度&lt;/option&gt;
-             &lt;option value="180"&gt;旋转180度&lt;/option&gt;
-         &lt;/select&gt;
-         &lt;span class="get_blob"&gt;获取blob对象&lt;/span&gt;
-     &lt;/span&gt;
- &lt;/script&gt;
- &lt;script&gt;
-    var tablet = new Tablet("#my_tablet",{
-      // 默认字体颜色
+         <select>
+             <option value="1">1</option>
+             <option value="3">3</option>
+             <option value="5">5</option>
+             <option value="8">8</option>
+             <option value="10" selected>10</option>
+             <option value="15">15</option>
+             <option value="20">20</option>
+         </select>
+         <!--<select>
+             <option value="0">正常</option>
+             <option value="90">顺时针旋转90度</option>
+             <option value="-90">逆时针旋转90度</option>
+             <option value="180">旋转180度</option>
+         </select>-->
+         <button type="button" class="get_blob">获取blob对象</button>
+         <button type="button" class="set-img">设置背景图片</button>
+         <button type="button" class="backOneStep">撤回</button>
+    </span>
+  </div>
+</div>
+
+<div class="container" id="container"></div>
+<script>
+  var tablet;
+  $(function () {
+    tablet = new Tablet("#container", {
+      // 画笔默认颜色
       defaultColor: "#2e76da",
-      /* canvas画布是否响应式，默认为true。当设置为响应式后浏览器大小改变后会重新计算canvas画布的宽高，
-      并且之前绘制的内容会被清除掉（canvas的一个特性）*/
-      response: true,
-      // canvas的宽度，宽度可以传递函数。不传宽度默认为canvas的父元素的宽度
-      width: 0,
-      // canvas的宽度，高度可以传递函数。不传宽度默认为canvas的父元素的高度
-      height: 0,
-      // 签名板的额外class
-      extraClass: "",
-      // tablet初始化后执行的函数（此时canvas上下文并未初始化）
-      onInit: function (){
-          var that = this,
-              container = this.container;
-          container.find("select").eq(0).on("change", function (){
-              that.setLineWidth($(this).val());
-          });
-          container.find("select").eq(1).on("change", function (){
-              that.rotate($(this).val());
-          });
-          container.find(".save-canvas-to-img").on("click", function (){
-              that.getBase64();
-          });
-          container.find(".get_blob").on("click", function (){
-              that.getBlob();
-          });
-          /*container.find(".download").on("click", function (){
-              document.getElementById("preview_img").src = that.getBase64();
-          });*/
-      },
+      // 默认背景色
+      defaultBackgroundColor: '#f60',
+      // canvas画布是否响应式
+      // response: true,
+      // canvas的宽度，宽高都可以传递函数
+      // width: 0,
+      // height: 0,
+      // 前面板的额外class
+      // extraClass: "",
+      // 设置获取到的图片的类型，可选值png、jpg，默认png
+      // imgType: "png",
       // 清除画布前执行的函数，如果该函数返回false，则不会进行清除
-      onBeforeClear: function() {},
+      // onBeforeClear: function () {},
       // 清除画布后执行的函数
-      onClear: function() {}
+      // onClear: function () {},
+      autoResize: true, // 浏览器窗口改变时是否重新绘制
+      // 画布初始化后的回调
+      onInit: function () {
+        var that = this,
+          container = this.container;
+        $(".-color-picker").each(function () {
+          var self = this,
+            $self = $(this);
+          if ($self.hasClass('color-color')) {
+
+            $self.colpick({
+              color: that.config.defaultColor,
+              layout: 'hex',
+              submitText: "确定",
+              onSubmit: function (hsb, hex, rgb, el, bySetColor) {
+                var color = "#" + hex;
+                $(el).css({
+                  //color: color,
+                  "border-color": color
+                }).colpickHide();
+                el.selectedColor = color;
+                that.color = color;
+
+                that.setColor(color);
+              }
+            });
+            $self.css({
+              "border-color": that.config.defaultColor
+            });
+          } else if ($self.hasClass('bg-color')) {
+            $self.colpick({
+              color: that.config.defaultBackgroundColor,
+              layout: 'hex',
+              submitText: "确定",
+              onSubmit: function (hsb, hex, rgb, el, bySetColor) {
+                var color = "#" + hex;
+                $(el).css({
+                  //color: color,
+                  "border-color": color
+                }).colpickHide();
+                el.selectedColor = color;
+                //that.bgColor = color;
+                that.setBackgroundColor(color);
+                // 重绘背景图后必须刷新一下，否则偶尔会出现最后一个线条被重复绘制一遍问题
+                var timer = setTimeout(function (){
+                  clearTimeout(timer);
+                  that.refresh();
+                }, 0);
+              }
+            });
+            $self.css({
+              "border-color": that.config.defaultBackgroundColor
+            });
+          }
+        });
+        $('.clear-canvas').on('click', function () {
+          that.clear();
+        })
+        $(".tablet-btns select").eq(0).on("change", function () {
+          that.setLineWidth($(this).val());
+        });
+        $(".save-canvas-to-img").on("click", function () {
+          console.log(that.getBase64());
+          if (!that.isMobile) {
+            alert("请按f12打开控制台查看base64图片数据！");
+          }
+        });
+        $(".get_blob").on("click", function () {
+          console.log(that.getBlob());
+        });
+        $(".set-img").on("click", function () {
+          that.setBackgroundImage(document.getElementById('bg_img'));
+          // 重绘背景图后必须刷新一下，否则偶尔会出现最后一个线条被重复绘制一遍问题
+          var timer = setTimeout(function (){
+            clearTimeout(timer);
+            that.refresh();
+          }, 0);
+        });
+        $(".backOneStep").on('click', function () {
+          that.revoke();
+        });
+      }
+    });
+    console.log(tablet);
   });
-&lt;/script&gt;
-</code>
-  </pre>
+</script>
+```
   <p>效果如图：</p>
   
-  ![Table画板效果](./images/tablet-effect.gif)
+  ![Table画板效果](./images/tablet2.0_effect.gif)
   
   <div class="pt-20"></div>
 
-  <h2>实例方法</h2>
-  <blockquote>
-      <span class="font-26">clear</span>
-  </blockquote>
-  <p class="pl-30"><code>clear()</code>方法用于清空画布。返回值为当前Tablet实例</p>
-  <blockquote>
-      <span class="font-26">getBase64</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>getBase64(type)</code>获取画布的base64数据，拿到的是base64字符串。
-    <code>type</code>参数为图片类型，可选值有jpg、png，默认png
-  </p>
-  <blockquote>
-      <span class="font-26">getBlob</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>getBlob(type)</code>获取画布的Blob数据（二进制数据），返回的是Blob对象。（内部实现：先获取base64字符串，再转换成Blob对象）
-    <code>type</code>参数为图片类型，可选值有jpg、png，默认png
-  </p>
-  <blockquote>
-      <span class="font-26">canvasReset</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>canvasReset()</code>该方法可以用来重置canvas画布的属性。重置只会重置canvas的lineWidth、strokeStyle、lineCap、lineJoin、shadowBlur、shadowColor属性
-  </p>
-  <blockquote>
-      <span class="font-26">rotate</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>rotate(degree)</code>旋转画布。degree为旋转的角度，可选角度为90、-90、180、-180
-  </p>
-  <blockquote>
-      <span class="font-26">setCanvasWH</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>setCanvasWH(width, height)</code>设置签名板的宽高。如果不传递宽高、或只传递了宽或高则会使用canvas的父容器的宽高。在移动端中签名板的宽高默认为window的宽高，这样做是为了在移动端中更好的进行写字。
-    <div class="pl-30">
-      <b>注意：</b>手动设置签名板的宽高（或旋转画布）后canvas之前绘制的内容会被清除掉。
-    </div>
-  </p>
-  <blockquote>
-      <span class="font-26">setColor</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>setColor(color)</code>设置canvas画笔的颜色。<code>color</code>为画笔颜色，默认为：#000。它的值可以为css表达颜色的值
-  </p>
-  <blockquote>
-      <span class="font-26">setLineWidth</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>setLineWidth(width)</code>设置canvas画笔的粗细。<code>width</code>为画笔粗细，pc端默认为8，移动端根据屏幕大小自动判断
-  </p>
-  <blockquote>
-     <span class="font-26">setBackgroundColor</span>
-  </blockquote>
-  <p class="pl-30">
-    <code>setBackgroundColor(color)</code>设置画布背景颜色。<code>color</code>为画布颜色
-  </p>
-  <blockquote>
-    <span class="font-26">setBackgroundImage</span>
-  </blockquote>
-  <p class="pl-30">
-     <code>setBackgroundImage(img, x, y, width, height)</code>设置画布背景图片。
-     <ul>
-        <li><code>img</code>为图片url地址或一个img dom对象（必填）</li>
-        <li><code>x</code>为绘制起始x点（非必填）</li>
-        <li><code>y</code>为绘制起始y点（非必填）</li>
-        <li><code>width</code>为绘制的宽度（非必填）</li>
-        <li><code>height</code>为绘制的高度（非必填）</li>
-    </ul>
-  </p>
+## 实例方法
+> `refresh(refreshWH)`
 
-  <br />
-  <h2>实例属性</h2>
-  <blockquote>
-      <span class="font-26">id</span>
-  </blockquote>
-  <p class="pl-30">该id为当前签名板元素的id，可通过该id获取到当前签名板</p>
-  <blockquote>
-      <span class="font-26">$canvas</span>
-  </blockquote>
-  <p class="pl-30">通过jQuery获取到的当前签名板的canvas元素</p>
-  <blockquote>
-      <span class="font-26">canvas</span>
-  </blockquote>
-  <p class="pl-30">当前签名板的canvas dom元素</p>
-  <blockquote>
-      <span class="font-26">ctx</span>
-  </blockquote>
-  <p class="pl-30">当前签名板的canvas的上下文</p>
-  <blockquote>
-      <span class="font-26">point</span>
-  </blockquote>
-  <p class="pl-30">签名板最后一次绘制时的坐标</p>
+刷新画布，线条及背景将会重绘，返回当前Tablet实例；如果`refreshWH`为true，则会重新计算画布宽高
+
+> `hasCanUseLine`
+
+判断是否有可用的线条，可以用来判断用户是否有绘制内容，返回值类型：`boolean`
+
+> `getRect`
+
+获取画布位置及宽高；返回值类型：`{x: number, width: number, y: number, height: number}`
+
+> `getBase64(type)`
+
+将画布内容转换成base64数据，并返回；`type`为图片类型，只有`jpg`、`png`两个选项，默认`png`；返回值类型：`string`
+
+> `getBlob(type)`
+
+将画布内容转换成blob数据，并返回；`type`为图片类型，只有`jpg`、`png`两个选项，默认`png`；返回值类型：`string`
+
+> `getMax(xPoints, yPoints)`
+
+获取x、y轴的最大、最小值；`xPoints, yPoints`分别为x轴、y轴所有坐标；返回值类型：`{top: number, left: number, bottom: number, right: number}`
+
+> `setColor(color)`
+
+设置画笔颜色；`color`为颜色值，可以是任何css的颜色表达式；返回当前Tablet实例
+
+> `setLineWidth(width)`
+
+设置画笔粗细；`width`为粗细值，`number类型`；返回当前Tablet实例
+
+> `setBackgroundColor(bgColor, x, y, width, height, addToOperationRecord)`
+
+设置画布背景颜色；返回当前Tablet实例
+
+1. `bgColor`：颜色值，可以是任何css的颜色表达式
+2. `x`：绘制起始x点，默认为0
+3. `y`：绘制起始y点，默认为0
+4. `width`：绘制宽度，默认为整个画布宽度
+5. `height`：绘制高度，默认为整个画布高度
+6. `addToOperationRecord`：是否将此操作添加到操作历史中，默认为true
+
+> `setBackgroundImage(img, x, y, width, height, onImgLoading, onFail, addToOperationRecord)`
+
+设置画布背景颜色；返回当前Tablet实例
+
+1. `img`：背景图片，值可以为图片url或者Image对象
+2. `x`：绘制起始x点，默认为0
+3. `y`：绘制起始y点，默认为0
+4. `width`：绘制宽度，默认为整个画布宽度
+5. `height`：绘制高度，默认为整个画布高度
+6. `onImgLoading`：图片加载中回调
+7. `onFail`：图片加载失败回调
+8. `addToOperationRecord`：是否将此操作添加到操作历史中，默认为true
+
+> `setCanvasWH(width, height)`
+
+设置画布的宽高；`width, height`分别为画布宽高，如果不传宽高则会自动计算；返回当前Tablet实例
+
+> `canvasReset`
+
+重置canvas画笔属性，使用最后一次的属性进行重置，返回当前Tablet实例；
+
+> `revoke`
+
+回退一步，返回当前Tablet实例；
 
 
+> `clear(clearPoints)`
+
+  `clear`方法用于清空画布，返回值当前Tablet实例；如果`clearPoints`为true，则会将之前绘制的线条及操作步骤清空
+ 
+
   <br />
-  <h2>演示地址</h2>
-  <h3>https://941477276.github.io/Tablet</h3>
-  <br />
-  <br />
-  <br />
-</div>
+## 演示地址
+
+### https://941477276.github.io/Tablet/index2.html

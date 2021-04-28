@@ -244,7 +244,7 @@
    */
   Tablet.prototype.getRect = function(){
     var w = this.width,
-        h = this.height;
+      h = this.height;
     if (this.degree == 90 || this.degree == -90) {
       w = this.height;
       h = this.width;
@@ -654,11 +654,9 @@
         //html += '        <div class="save-canvas-to-img">';
         //html += this.config.saveBtnHtml ? this.config.saveBtnHtml : '保存图片';
         //html += '        </div>';
-
         if(typeof this.config.otherHtml === "string" && this.config.otherHtml.length > 0){
             html += this.config.otherHtml;
         }
-
         html += '    </div>';
     }*/
     html += '    <div class="-canvas-wrapper">';

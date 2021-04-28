@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport">
+  <meta name="format-detection" content="telephone=no, email=no"/>
+  <meta name="description" content=""/>
+  <meta name="wap-font-scale" content="no"><!--uc浏览器判断到页面上文字居多时，会自动放大字体优化移动用户体验。这个可以禁止掉-->
+  <meta name="keywords" content=""/>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+  <meta name="apple-touch-fullscreen" content="yes"/><!-- 是否启用 WebApp 全屏模式，删除苹果默认的工具栏和菜单栏 -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <!-- 设置苹果工具栏颜色:默认值为 default，可以定为 black和 black-translucent-->
+  <meta http-equiv="Cache-Control" content="no-siteapp"/><!-- 不让百度转码 -->
+  <meta name="HandheldFriendly" content="true"><!-- 针对手持设备优化，主要是针对一些老的不识别viewport的浏览器，比如黑莓 -->
+  <meta name="MobileOptimized" content="320"><!-- 微软的老式浏览器 -->
+  <meta name="screen-orientation" content="portrait"><!-- uc强制竖屏 -->
+  <meta name="x5-orientation" content="portrait"><!-- QQ强制竖屏 -->
+  <meta name="x5-page-mode" content="app"><!-- QQ应用模式 -->
+  <meta name="msapplication-tap-highlight" content="no"><!-- windows phone 点击无高光 -->
+  <meta name="apple-mobile-web-app-capable" content="yes"><!-- ios 开启对web app程序的支持 -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"><!-- ios 改变顶部状态条的颜色 -->
+  <title>canvas写字板</title>
+  <link rel="stylesheet" href="css/colpick2.0.css"/>
+  <style>
+    body, canvas {
+      /* height: 1000px; */
+      padding: 0;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+
+    }
+
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      height: 600px;
+        max-width: 1300px;
+    }
+
+    .container .-tablet{
+        height: 600px;
+    }
+
+    .container .-tablet,
+    .container .-tablet-container,
+    .container .-canvas-wrapper {
+      min-height: 100%;
+    }
+
+    .tool-bar{
+      margin-bottom: 100px;
+    }
+  </style>
+</head>
+<body>
+<!-- <h1>canvas写字板</h1> -->
+
+<div class="tool-bar">
+  <div class="tablet-btns" style="padding: 10px;">
+    <input class="-color-picker color-color" type="text" value="字体颜色" id="colpick" readonly/>
+    <input class="-color-picker bg-color" type="text" value="背景颜色" id="colpick2" readonly/>
+    <div class="clear-canvas">清屏</div>
+    <div class="save-canvas-to-img">保存图片</div>
+    <span>
+         画笔粗细
+         <select>
+             <option value="1">1</option>
+             <option value="3">3</option>
+             <option value="5">5</option>
+             <option value="8">8</option>
+             <option value="10" selected>10</option>
+             <option value="15">15</option>
+             <option value="20">20</option>
+         </select>
+         <!--<select>
+             <option value="0">正常</option>
+             <option value="90">顺时针旋转90度</option>
+             <option value="-90">逆时针旋转90度</option>
+             <option value="180">旋转180度</option>
+         </select>-->
+         <button type="button" class="get_blob">获取blob对象</button>
+         <button type="button" class="set-img">设置背景图片</button>
+         <button type="button" class="backOneStep">撤回</button>
+    </span>
+  </div>
+</div>
+
+<div class="container" id="container"></div>
+
+
+
+
+<div style="height: 1200px;">
+  <img id="preview_img" style="position: absolute;" src="" alt=""/>
+</div>
+<img src="./images/beijing1.png" id="bg_img" style="display: none;" alt="">
+
+<script src="jquery-1.12.4.min.js"></script>
+<!--<script src="dist/Tablet-1.0.min.js"></script>-->
+<script src="colpick.js"></script>
+<script src="./Tablet-2.0.1.js"></script>
+<script>
+  var tablet;
+  $(function () {
+    tablet = new Tablet("#container", {
+      defaultColor: "#2e76da",
+      // defaultBackgroundColor: '#f60',
+      onInit: function () {
+        var that = this,
+          container = this.container;
+        $(".-color-picker").each(function () {
+          var self = this,
+            $self = $(this);
+          if ($self.hasClass('color-color')) {
+
+            $self.colpick({
+              color: that.config.defaultColor,
+              layout: 'hex',
+              submitText: "确定",
+              onSubmit: function (hsb, hex, rgb, el, bySetColor) {
+                var color = "#" + hex;
+                $(el).css({
+                  //color: color,
+                  "border-color": color
+                }).colpickHide();
+                el.selectedColor = color;
+                that.color = color;
+
+                that.setColor(color);
+              }
+            });
+            $self.css({
+              "border-color": that.config.defaultColor
+            });
+          } else if ($self.hasClass('bg-color')) {
+            $self.colpick({
+              color: that.config.defaultBackgroundColor,
+              layout: 'hex',
+              submitText: "确定",
+              onSubmit: function (hsb, hex, rgb, el, bySetColor) {
+                var color = "#" + hex;
+                $(el).css({
+                  //color: color,
+                  "border-color": color
+                }).colpickHide();
+                el.selectedColor = color;
+                //that.bgColor = color;
+                that.setBackgroundColor(color);
+                // 重绘背景图后必须刷新一下，否则偶尔会出现最后一个线条被重复绘制一遍问题
+                var timer = setTimeout(function (){
+                  clearTimeout(timer);
+                  that.refresh();
+                }, 0);
+              }
+            });
+            $self.css({
+              "border-color": that.config.defaultBackgroundColor
+            });
+          }
+        });
+        $('.clear-canvas').on('click', function () {
+          that.clear();
+        })
+        $(".tablet-btns select").eq(0).on("change", function () {
+          that.setLineWidth($(this).val());
+        });
+        /*$(".tablet-btns select").eq(1).on("change", function () {
+          that.rotate($(this).val());
+        });*/
+        $(".save-canvas-to-img").on("click", function () {
+          console.log(that.getBase64());
+          if (!that.isMobile) {
+            alert("请按f12打开控制台查看base64图片数据！");
+          }
+        });
+        $(".get_blob").on("click", function () {
+          console.log(that.getBlob());
+        });
+        $(".set-img").on("click", function () {
+          //console.log(that.getBlob());
+          // that.setBackgroundImage('./images/beijing1.png');
+          that.setBackgroundImage(document.getElementById('bg_img'));
+          // 重绘背景图后必须刷新一下，否则偶尔会出现最后一个线条被重复绘制一遍问题
+          var timer = setTimeout(function (){
+            clearTimeout(timer);
+            that.refresh();
+          }, 0);
+        });
+        $(".backOneStep").on('click', function () {
+          that.revoke();
+        });
+      }
+    });
+    console.log(tablet);
+  });
+</script>
+</body>
+</html>
