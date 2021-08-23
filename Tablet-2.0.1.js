@@ -170,6 +170,7 @@
       defaultBackgroundColor: "transparent",
       defaultBgType: 'color', // 默认背景类型
       defaultBgImg: null, // 默认背景图片 // 背景类型，有color、img两种
+      defaultHeight: 400, // 默认高度
       autoResize: true, // 浏览器窗口改变时是否重新绘制
       // 设置获取到的图片的类型，可选值png、jpg，默认png
       imgType: "png",
@@ -678,7 +679,7 @@
    * @returns {Tablet}
    */
   Tablet.prototype.setCanvasWH = function (width, height) {
-    if (!width || !height) {
+    if (!width || !height) { // 如果外部没有传递宽高，则取画布元素的宽高
       var tablet = this.$tablet;
       var bl = parseFloat(tablet.css('border-left-width')),
         br = parseFloat(tablet.css('border-right-width')),
@@ -690,17 +691,31 @@
         pb = parseFloat(tablet.css('padding-bottom'));
       this.width = tablet.width() - bl - br - pl - pr;
       this.height = tablet.height() - bt - bb - pt - pb;
+      if(this.width <= 0){ // 如果画布没有宽度，则取画布父级元素的宽度
+        this.width = this.container.width();
+      }
+      if(this.height <= 0){ // 如果画布没有高度，则取画布父级元素的高度
+        this.height = this.container.height();
+        if(this.height <= 0){
+          this.height = this.config.defaultHeight;
+        }
+      }
     } else {
-      console.log(1111)
       this.width = width;
       this.height = height;
     }
+    this.$canvas.css('display', 'block');
+
     var lineConfig = this.lineConfig;
     // 根据屏幕像素比优化canvas
     var devicePixelRatio = this.devicePixelRatio = window.devicePixelRatio;
     if (devicePixelRatio && devicePixelRatio > 1) {
       var canvasW = this.width * devicePixelRatio;
       var canvasH = this.height * devicePixelRatio;
+      this.$canvas.width(this.width);
+      this.$canvas.height(this.height);
+      this.$canvasBack.width(this.width);
+      this.$canvasBack.height(this.height);
       this.canvas.width = canvasW;
       this.canvas.height = canvasH;
       this.canvasBack.width = canvasW;
@@ -874,15 +889,14 @@
       生成前面板html
   */
   Tablet.prototype.buildTablet = function () {
-    var that = this,
-      html = '',
-      flex = '';
-    if (this.isMobile) {
+    var html = '',
+        flex = '';
+    /*if (this.isMobile) {
       flex = 'flex ';
-    }
+    }*/
     html += '<div class="-tablet ' + flex + this.config.extraClass + '" id="' + this.id + '">';
     html += '    <div class="-canvas-wrapper">';
-    html += '        <canvas style="cursor: crosshair;"></canvas>';
+    html += '        <canvas class="tablet-canvas" style="cursor: crosshair;display: none;"></canvas>'; // 默认隐藏画布，以方便在初始化时好获取高度
     html += '        <canvas class="backup-canvas"></canvas>';
     html += '    </div>';
     html += '</div>';

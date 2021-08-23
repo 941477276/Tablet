@@ -43,20 +43,24 @@
     }
 
     .container {
-      height: 600px;
-        max-width: 1300px;
+        /*display: inline-block;
+        width: 500px;*/
+        height: 500px;
+        margin: 100px;
     }
 
-    .container .-tablet{
+   /* .container .-tablet{
         height: 600px;
-    }
+    }*/
 
-    .container .-tablet,
+   /* .container .-tablet,
     .container .-tablet-container,
     .container .-canvas-wrapper {
       min-height: 100%;
+    }*/
+    .tablet-canvas{
+        outline: dashed 2px #f60;
     }
-
     .tool-bar{
       margin-bottom: 100px;
     }
@@ -91,6 +95,7 @@
          <button type="button" class="get_blob">获取blob对象</button>
          <button type="button" class="set-img">设置背景图片</button>
          <button type="button" class="backOneStep">撤回</button>
+         <!--<button type="button" class="rotate" data-degree="90">旋转90度</button>-->
     </span>
   </div>
 </div>
@@ -199,6 +204,10 @@
         $(".backOneStep").on('click', function () {
           that.revoke();
         });
+        /*$('.rotate').on('click', function () {
+          that.rotate(this.dataset.degree);
+          console.log(that);
+        });*/
       }
     });
     console.log(tablet);

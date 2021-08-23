@@ -478,8 +478,8 @@
 }
 .-tablet {
 	/*border: 2px dashed #ccc;*/
-	outline: 2px dashed #ccc;
-	margin: 0 10px;
+	/*outline: 2px dashed #ccc;
+	margin: 0 10px;*/
 }
 /*.-canvas-wrapper>canvas{
     cursor: crosshair;
