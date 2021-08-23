@@ -1,6 +1,12 @@
 # Tablet
 Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他依赖，`传统网站`或`vue`、`react`、`angular`等单页面应用皆可使用！兼容各种移动设备！
-<h1>canvas签名板文档</h1>
+
+Tablet is a canvas-based web page drawing board with a built-in simplified version of jQuery, 
+no other dependencies, and the operation steps can be withdrawn. It can be used on `traditional w
+ebsites` or single-page applications such as `vue`, `react`, and `angular`! 
+Compatible with various mobile devices!
+
+## canvas签名板文档
 这是<code>Tablet2.0</code>文档，Tablet1.0文档请前往 
 
 [Tablet1.0文档](https://github.com/941477276/Tablet/blob/master/README.md)
