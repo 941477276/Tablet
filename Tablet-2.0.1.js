@@ -191,7 +191,7 @@
     this.id = "Tablet_LYN_" + (Tablet._conut++);
 
 
-    this.isMobile = isMobile = /phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i.test(navigator.userAgent);
+    this.isMobile = /phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i.test(navigator.userAgent);
     this.lineConfig = {
       strokeStyle: this.config.defaultColor,
       lineWidth: 8,
