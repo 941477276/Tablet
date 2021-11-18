@@ -366,7 +366,7 @@
     }
     drawBg({ bgType: this.config.defaultBgType, bgColor: this.config.defaultBackgroundColor, bgImg: this.config.defaultBgImg });
 
-    if (isMobile) {
+    if (this.isMobile) {
       this.$canvas.on("touchstart", start);
       this.$canvas.on("touchmove", move);
     } else {
