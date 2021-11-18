@@ -1,0 +1,34 @@
+{
+  "name": "canvas-tablet",
+  "version": "2.0.1",
+  "description": "Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他依赖，`传统网站`或`vue`、`react`、`angular`等单页面应用皆可使用！兼容各种移动设备！",
+  "main": "dist/Table-2.0.1.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/941477276/Tablet.git"
+  },
+  "author": "hearth_learning_money",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/941477276/Tablet/issues"
+  },
+  "homepage": "https://github.com/941477276/Tablet#readme",
+  "keywords": [
+    "canvas",
+    "drawing board",
+    "Online handwriting board",
+    "画板",
+    "在线画布",
+    "在线手写板"
+  ],
+  "files": [
+    "dist/Table-2.0.1.min.js",
+    "images/tablet2.0_effect.gif",
+    "package.json",
+    "README.md",
+    "README-1.0.md"
+  ]
+}

@@ -11,8 +11,13 @@ Compatible with various mobile devices!
 
 [Tablet1.0文档](https://github.com/941477276/Tablet/blob/master/README.md)
 
-## 基本使用
+## 安装
+1. **npm安装：**
+`npm install canvas-tablet -S`
+2. **script标签引入：**
+`将/dist/Table-2.0.1.min.js下载下来即可`
 
+## 基本使用
 ```
 <div class="tool-bar">
   <div class="tablet-btns" style="padding: 10px;">
@@ -45,6 +50,7 @@ Compatible with various mobile devices!
 </div>
 
 <div class="container" id="container"></div>
+<script src="./dist/Table.2.0.1.min.js"></script>  
 <script>
   var tablet;
   $(function () {
@@ -238,7 +244,7 @@ Compatible with various mobile devices!
   `clear`方法用于清空画布，返回值当前Tablet实例；如果`clearPoints`为true，则会将之前绘制的线条及操作步骤清空
  
 
-  <br />
+
 ## 演示地址
 
 ### https://941477276.github.io/Tablet/index2.html
