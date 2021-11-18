@@ -265,7 +265,7 @@
   }
   /* 内部使用，给canvas进行一些初始化设置 */
   Tablet.prototype._ctxInit = function () {
-    var lines = this.lines;
+    // var lines = this.lines;
     var that = this,
       // 画线函数
       pait = function (singal) {
@@ -277,7 +277,7 @@
             /* that.ctxBack.beginPath();
             that.ctxBack.moveTo(that.point.x, that.point.y);*/
 
-            lines.push(new Line(that.ctx, that.ctxBack, $.extend({}, that.lineConfig), $.extend({}, that.bgConfig)));
+            that.lines.push(new Line(that.ctx, that.ctxBack, $.extend({}, that.lineConfig), $.extend({}, that.bgConfig)));
           case 2:
             // 重新设置画笔大小，当浏览器大小改变后，再在画布上画线如果不重新设置画笔的话则会出问题
             that.ctx.lineWidth = that.lineConfig.lineWidth * that.lineConfig.lineWidthZoomRate;
@@ -286,7 +286,7 @@
             /*that.ctxBack.lineTo(that.point.x, that.point.y);
             that.ctxBack.stroke();*/
             // 在添加点的时候，点的实际位置要根据画布缩放比例来计算，这样在画布缩放时才能更好的重画
-            lines[lines.length - 1].addPoint(that.point.x / that.widthZoomRate, that.point.y / that.heightZoomRate);
+            that.lines[that.lines.length - 1].addPoint(that.point.x / that.widthZoomRate, that.point.y / that.heightZoomRate);
             break;
           default:
         }
@@ -337,22 +337,22 @@
       } : move,
       endEvent = function () {
         that.pressed = false;
-        if (lines.length > 0) {
-          if (lines[lines.length - 1]) {
+        if (that.lines.length > 0) {
+          if (that.lines[that.lines.length - 1]) {
             // 每次鼠标弹起时都将最近一次绘制的内容绘制到副本画布中
-            lines[lines.length - 1].draw(0, 0, true);
+            that.lines[that.lines.length - 1].draw(0, 0, true);
           }
         }
       },
       addOperationRecordFn = function () {
-        if (lines.length > 0) {
+        if (that.lines.length > 0) {
           console.log('addOperationRecord drawLine')
           that.operationRecords.push(new OperationRecord({
             type: 'drawLine',
             tablet: that,
-            lines: lines,
+            lines: that.lines,
             bgConfig: that.bgConfig,
-            linesIndex: lines.length - 1
+            linesIndex: that.lines.length - 1
           }));
         }
       };
@@ -708,7 +708,7 @@
 
     var lineConfig = this.lineConfig;
     // 根据屏幕像素比优化canvas
-    var devicePixelRatio = this.devicePixelRatio = window.devicePixelRatio;
+    var devicePixelRatio = this.devicePixelRatio = (window.devicePixelRatio || 1);
     if (devicePixelRatio && devicePixelRatio > 1) {
       var canvasW = this.width * devicePixelRatio;
       var canvasH = this.height * devicePixelRatio;
@@ -851,7 +851,7 @@
    * @param {type: string} 生成的图片格式，只有png、jpg两个选项
    * @returns {string}
    */
-  Tablet.prototype.getBase64 = function (type) {
+  Tablet.prototype.getBase64 = function (type, angle) {
     var that = this;
     if (!type) {
       type = "image/png";
@@ -863,7 +863,57 @@
         type = "image/jpg";
       }
     }
-    var base64Img = this.canvas.toDataURL(type, 1);
+    var base64Img = '';
+    if(!angle){
+      base64Img = this.canvas.toDataURL(type, 1);
+    }else {
+      var width = this.width;
+      var height = this.height;
+      // 根据屏幕像素比优化canvas
+      var devicePixelRatio = this.devicePixelRatio;
+      if (devicePixelRatio && devicePixelRatio > 1) {
+        width = width * devicePixelRatio;
+        height = height * devicePixelRatio;
+      }
+      if(angle === -90){
+        angle = 270;
+      }
+
+      // 计算弧度
+      var radian = (angle * Math.PI) / 180;
+      // 计算方向
+      var direction = (angle / 90) % 4;
+      var newCanvas = document.createElement('canvas');
+      var newCanvasCtx = newCanvas.getContext('2d');
+
+      if (direction === 0) {
+        newCanvas.width = width;
+        newCanvas.height = height;
+        newCanvasCtx.drawImage(this.canvas, 0, 0);
+      } else if (direction === 1) {
+        newCanvas.width = height;
+        newCanvas.height = width;
+        newCanvasCtx.translate(newCanvas.width * 0.5, newCanvas.height * 0.5);
+        newCanvasCtx.rotate(radian);
+        newCanvasCtx.drawImage(this.canvas, -newCanvas.height / 2, -newCanvas.width / 2);
+        // newCanvasCtx.restore();
+      } else if (direction === 2) {
+        newCanvas.width = width;
+        newCanvas.height = height;
+        newCanvasCtx.translate(width * 0.5, height * 0.5);
+        newCanvasCtx.rotate(radian);
+        newCanvasCtx.drawImage(this.canvas, -newCanvas.width / 2, -newCanvas.height / 2);
+      } else if (direction === 3) {
+        newCanvas.width = height;
+        newCanvas.height = width;
+        newCanvasCtx.translate(newCanvas.width * 0.5, newCanvas.height * 0.5);
+        newCanvasCtx.rotate(radian);
+        newCanvasCtx.drawImage(this.canvas, -newCanvas.height / 2, -newCanvas.width / 2);
+      }
+      base64Img = newCanvas.toDataURL(type, 1);
+      newCanvas = null;
+      newCanvasCtx = null;
+    }
     return base64Img;
   }
   /**
@@ -871,9 +921,9 @@
    * @param {type: string} 图片的后缀
    * @returns {Blob}
    */
-  Tablet.prototype.getBlob = function (type) {
+  Tablet.prototype.getBlob = function (type, angle) {
     var that = this,
-      base64Img = this.getBase64(type),
+      base64Img = this.getBase64(type, angle),
       arr = base64Img.split(","),
       // mime类型
       mime = arr[0].match(/:(.*?);/)[1],

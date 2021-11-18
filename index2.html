@@ -46,7 +46,7 @@
         /*display: inline-block;
         width: 500px;*/
         height: 500px;
-        margin: 100px;
+        margin: 50px;
     }
 
    /* .container .-tablet{
@@ -74,7 +74,10 @@
     <input class="-color-picker color-color" type="text" value="字体颜色" id="colpick" readonly/>
     <input class="-color-picker bg-color" type="text" value="背景颜色" id="colpick2" readonly/>
     <div class="clear-canvas">清屏</div>
-    <div class="save-canvas-to-img">保存图片</div>
+    <div class="save-canvas-to-img angle0">保存图片</div>
+    <div class="save-canvas-to-img angle90">保存图片(旋转90度)</div>
+    <div class="save-canvas-to-img angle180">保存图片(旋转180度)</div>
+    <div class="save-canvas-to-img angle90-2">保存图片(旋转-90度)</div>
     <span>
          画笔粗细
          <select>
@@ -174,7 +177,7 @@
           }
         });
         $('.clear-canvas').on('click', function () {
-          that.clear();
+          that.clear(true);
         })
         $(".tablet-btns select").eq(0).on("change", function () {
           that.setLineWidth($(this).val());
@@ -182,8 +185,26 @@
         /*$(".tablet-btns select").eq(1).on("change", function () {
           that.rotate($(this).val());
         });*/
-        $(".save-canvas-to-img").on("click", function () {
+        $(".save-canvas-to-img.angle0").on("click", function () {
           console.log(that.getBase64());
+          if (!that.isMobile) {
+            alert("请按f12打开控制台查看base64图片数据！");
+          }
+        });
+        $(".save-canvas-to-img.angle90").on("click", function () {
+          console.log(that.getBase64('', 90));
+          if (!that.isMobile) {
+            alert("请按f12打开控制台查看base64图片数据！");
+          }
+        });
+        $(".save-canvas-to-img.angle180").on("click", function () {
+          console.log(that.getBase64('', 180));
+          if (!that.isMobile) {
+            alert("请按f12打开控制台查看base64图片数据！");
+          }
+        });
+        $(".save-canvas-to-img.angle90-2").on("click", function () {
+          console.log(that.getBase64('', -90));
           if (!that.isMobile) {
             alert("请按f12打开控制台查看base64图片数据！");
           }
