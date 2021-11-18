@@ -108,17 +108,18 @@
 
 
 
-<div style="height: 1200px;">
-  <img id="preview_img" style="position: absolute;" src="" alt=""/>
+<div style="height: 1200px;padding: 0 15px">
+  <img id="preview_img" style="display: block;max-width: 100%;border: 4px solid #aec6ec;" src="" alt=""/>
 </div>
 <img src="./images/beijing1.png" id="bg_img" style="display: none;" alt="">
 
-<script src="jquery-1.12.4.min.js"></script>
+<script src="./jquery-1.12.4.min.js"></script>
 <!--<script src="dist/Tablet-1.0.min.js"></script>-->
-<script src="colpick.js"></script>
+<script src="./colpick.js"></script>
 <script src="./Tablet-2.0.1.js"></script>
 <script>
   var tablet;
+  var previewImgEl = document.getElementById('preview_img');
   $(function () {
     tablet = new Tablet("#container", {
       defaultColor: "#2e76da",
@@ -186,25 +187,36 @@
           that.rotate($(this).val());
         });*/
         $(".save-canvas-to-img.angle0").on("click", function () {
-          console.log(that.getBase64());
+          var imgBase64 = that.getBase64();
+          previewImgEl.src = imgBase64;
+          console.log(imgBase64);
           if (!that.isMobile) {
             alert("请按f12打开控制台查看base64图片数据！");
           }
         });
         $(".save-canvas-to-img.angle90").on("click", function () {
-          console.log(that.getBase64('', 90));
+          // console.log(that.getBase64('', 90));
+          var imgBase64 = that.getBase64('', 90);
+          previewImgEl.src = imgBase64;
+          console.log(imgBase64);
           if (!that.isMobile) {
             alert("请按f12打开控制台查看base64图片数据！");
           }
         });
         $(".save-canvas-to-img.angle180").on("click", function () {
-          console.log(that.getBase64('', 180));
+          // console.log(that.getBase64('', 180));
+          var imgBase64 = that.getBase64('', 180);
+          previewImgEl.src = imgBase64;
+          console.log(imgBase64);
           if (!that.isMobile) {
             alert("请按f12打开控制台查看base64图片数据！");
           }
         });
         $(".save-canvas-to-img.angle90-2").on("click", function () {
-          console.log(that.getBase64('', -90));
+          // console.log(that.getBase64('', -90));
+          var imgBase64 = that.getBase64('', -90);
+          previewImgEl.src = imgBase64;
+          console.log(imgBase64);
           if (!that.isMobile) {
             alert("请按f12打开控制台查看base64图片数据！");
           }

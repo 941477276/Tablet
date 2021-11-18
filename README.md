@@ -172,13 +172,17 @@ Compatible with various mobile devices!
 
 获取画布位置及宽高；返回值类型：`{x: number, width: number, y: number, height: number}`
 
-> `getBase64(type)`
+> `getBase64(type, angle)`
 
-将画布内容转换成base64数据，并返回；`type`为图片类型，只有`jpg`、`png`两个选项，默认`png`；返回值类型：`string`
+将画布内容转换成base64数据，并返回；返回值类型：`string`
++ `type`：图片类型，只有`jpg`、`png`两个选项，默认`png`
++ `angle`：旋转角度，默认为0，角度支持**90的整数倍**
 
-> `getBlob(type)`
+> `getBlob(type, angle)`
 
-将画布内容转换成blob数据，并返回；`type`为图片类型，只有`jpg`、`png`两个选项，默认`png`；返回值类型：`string`
+将画布内容转换成blob数据，并返回；返回值类型：`blob`
++ `type`：图片类型，只有`jpg`、`png`两个选项，默认`png`
++ `angle`：旋转角度，默认为0，角度支持**90的整数倍**
 
 > `getMax(xPoints, yPoints)`
 
