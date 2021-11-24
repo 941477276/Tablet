@@ -350,6 +350,7 @@
         }
       },
       addOperationRecordFn = function () {
+        that.pressed = false;
         if (that.lines.length > 0) {
           console.log('addOperationRecord drawLine')
           that.operationRecords.push(new OperationRecord({
@@ -460,7 +461,7 @@
     if (!hasCanUseLines) {
       that.canvasReset();
       dragBg();
-      return;
+      return this;
     }
     that.ctxBack.clearRect(0, 0, that.width, that.height);
     // 重绘
@@ -474,8 +475,8 @@
     that.ctx.clearRect(0, 0, that.width, that.height);
     // 重绘背景
     if (bgConfig.bgType == 'color' && bgConfig.bgColor == 'transparent') {
-      that.ctx.drawImage(that.canvasBack, 0, 0);
-      return;
+      that.ctx.drawImage(that.canvasBack, 0, 0, that.width * devicePixelRatio, that.height * devicePixelRatio, 0, 0, that.width, that.height);
+      return this;
     }
     dragBg();
     return this;
