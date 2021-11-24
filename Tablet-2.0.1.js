@@ -45,11 +45,11 @@
     this.points = [];
   }
 
-  Line.prototype.draw = function (widthRate, heightRate, onlyCtxBackDraw) {
+  Line.prototype.draw = function (widthRate, heightRate, onlyCtxBackDraw, devicePixelRatio) {
     widthRate = typeof widthRate === 'undefined' ? 1 : parseFloat(widthRate);
     heightRate = typeof heightRate === 'undefined' ? 1 : parseFloat(heightRate);
-    widthRate = widthRate > 0 ? widthRate : 1;
-    heightRate = heightRate > 0 ? heightRate : 1;
+    widthRate = (widthRate > 0 ? widthRate : 1);
+    heightRate = (heightRate > 0 ? heightRate : 1);
     onlyCtxBackDraw = typeof onlyCtxBackDraw === 'undefined' ? false : !!onlyCtxBackDraw;
     var lineConfig = this.lineConfig;
     var ctxBack = this.ctxBack;
@@ -63,13 +63,17 @@
     // 如果points的长度为1，则说明这是一个点
     if (this.points.length == 1) {
       var point = this.points[0];
-      ctx.moveTo(point.x * widthRate, point.y * heightRate);
-      ctx.lineTo(point.x * widthRate, point.y * heightRate);
+      var x = point.x * widthRate;
+      var y = point.y * heightRate;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y);
       ctx.stroke();
       return;
     }
     this.points.forEach(function (point, index) {
-      ctx[index > 0 ? 'lineTo' : 'moveTo'](point.x * widthRate, point.y * heightRate);
+      var x = point.x * widthRate;
+      var y = point.y * heightRate;
+      ctx[index > 0 ? 'lineTo' : 'moveTo'](x, y);
       // 这里必须及时绘制，如果将绘制放到循环外面，那么在重绘过程中线条会变细
       if (index > 0) {
         ctx.stroke();
@@ -101,7 +105,7 @@
       onlyCtxBackDraw = typeof onlyCtxBackDraw == 'undefined' ? false : !!onlyCtxBackDraw;
       that.lines.forEach(function (line) {
         if (line) {
-          line.draw(tablet.widthZoomRate, tablet.heightZoomRate, onlyCtxBackDraw);
+          line.draw(tablet.widthZoomRate, tablet.heightZoomRate, onlyCtxBackDraw, that.tablet.devicePixelRatio);
         }
       });
     }
@@ -113,13 +117,13 @@
         tablet.setBackgroundImage(bgConfig.bgImg, bgConfig.x, bgConfig.y, bgConfig.width, bgConfig.height, null, null, false);
       }
     }
+    var devicePixelRatio = this.tablet.devicePixelRatio;
     switch (this.type) {
       case 'drawLine':
         ctxBack.clearRect(0, 0, tablet.width, tablet.height);
+
         drawLine(true);
         drawBg(that.bgConfig);
-        /*ctx.clearRect(0, 0, tablet.width, tablet.height);
-        ctx.drawImage(tablet.canvasBack, 0, 0);*/
         break;
       // case 'lineConfig':
       //  break;
@@ -127,6 +131,7 @@
       case 'bgImg':
         // 先在副本画布画线
         ctxBack.clearRect(0, 0, tablet.width, tablet.height);
+
         drawLine(true);
         // 再执行画背景操作
         drawBg(that.bgConfig);
@@ -190,7 +195,7 @@
     this.container = container;
     this.id = "Tablet_LYN_" + (Tablet._conut++);
 
-
+    this.devicePixelRatio = window.devicePixelRatio || 1;
     this.isMobile = /phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i.test(navigator.userAgent);
     this.lineConfig = {
       strokeStyle: this.config.defaultColor,
@@ -340,7 +345,7 @@
         if (that.lines.length > 0) {
           if (that.lines[that.lines.length - 1]) {
             // 每次鼠标弹起时都将最近一次绘制的内容绘制到副本画布中
-            that.lines[that.lines.length - 1].draw(0, 0, true);
+            that.lines[that.lines.length - 1].draw(0, 0, true, that.devicePixelRatio);
           }
         }
       },
@@ -459,10 +464,10 @@
     }
     that.ctxBack.clearRect(0, 0, that.width, that.height);
     // 重绘
-    that.lines.forEach(item => {
+    that.lines.forEach(function (item) {
       if (item) {
         // 使用副本画布进行绘制，以方便后面绘制背景色/图
-        item.draw(widthRate, heightRate, true);
+        item.draw(widthRate, heightRate, true, that.devicePixelRatio);
       }
     });
 
@@ -561,11 +566,12 @@
    */
   Tablet.prototype.setBackgroundColor = function (bgColor, x, y, width, height, addToOperationRecord) {
     var canvasRect = this.getRect();
-    var x = x || 0,
-      y = y || 0,
-      that = this,
+    var that = this,
       newWidth = width > 0 ? width : canvasRect.width,
-      newHeight = height > 0 ? height : canvasRect.height;
+      newHeight = height > 0 ? height : canvasRect.height,
+      devicePixelRatio = this.devicePixelRatio;
+    x = x > 0 ? x : 0;
+    y = y > 0 ? y : 0;
 
     this.bgConfig.bgType = 'color';
     this.bgConfig.bgColor = bgColor;
@@ -584,8 +590,9 @@
 
     // this.ctx.beginPath();
     if (this.hasCanUseLine()) {
-      // 将原先绘制的内容绘制回去
-      this.ctx.drawImage(this.canvasBack, x, y, newWidth, newWidth, x, y, newWidth, newWidth);
+      // 将原先绘制的内容绘制回去，绘制时原还不的大小需要乘以devicePixelRatio，否则会出现内容绘制不全的问题
+      console.log('重新绘制',  x, y, newWidth * devicePixelRatio, newHeight * devicePixelRatio, x, y, newWidth, newHeight)
+      that.ctx.drawImage(that.canvasBack, x, y, newWidth * devicePixelRatio, newHeight * devicePixelRatio, x, y, newWidth, newHeight);
     }
     addToOperationRecord = typeof addToOperationRecord == 'undefined' ? true : false;
     if (addToOperationRecord) {
@@ -618,10 +625,11 @@
     }
 
     var that = this;
+    var devicePixelRatio = this.devicePixelRatio;
     var imgLoad = function () {
       var canvasRect = that.getRect();
-      x = x || 0;
-      y = y || 0;
+      x = x > 0 ? x : 0;
+      y = y > 0 ? y : 0;
       var newWidth = width > 0 ? width : canvasRect.width;
       var newHeight = height > 0 ? height : canvasRect.height;
       that.bgConfig.bgType = 'img';
@@ -636,8 +644,11 @@
       that.ctx.clearRect(x, y, newWidth, newHeight);
       // 绘制图片
       that.ctx.drawImage(img, x, y, newWidth, newHeight);
-      // 将原先绘制的内容绘制回去
-      that.ctx.drawImage(that.canvasBack, x, y, newWidth, newHeight, x, y, newWidth, newHeight);
+      if (that.hasCanUseLine()) {
+        // 将原先绘制的内容绘制回去，绘制时原还不的大小需要乘以devicePixelRatio，否则会出现内容绘制不全的问题
+        console.log('重新绘制',  x, y, newWidth * devicePixelRatio, newHeight * devicePixelRatio, x, y, newWidth, newHeight)
+        that.ctx.drawImage(that.canvasBack, x, y, newWidth * devicePixelRatio, newHeight * devicePixelRatio, x, y, newWidth, newHeight);
+      }
       addToOperationRecord = typeof addToOperationRecord == 'undefined' ? true : false;
       if (addToOperationRecord) {
         console.log('addOperationRecord bgImg')
