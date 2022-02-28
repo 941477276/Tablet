@@ -231,7 +231,7 @@
     this.operationRecords = []; // 操作记录
     // 旋转的角度
     this.degree = 0;
-    this.version = '2.0.3';
+    this.version = '2.0.4';
 
     if (typeof this.config.width === "function") {
       this.width = this.config.width();
@@ -243,18 +243,10 @@
     } else {
       this.height = this.config.height;
     }
-
-    // 设置canvas画布的宽高
-    this.setCanvasWH(this.width, this.height);
-    this.widthOrigin = this.width;
-    this.heightOrigin = this.height;
-    this.widthZoomRate = 1; // 画布宽度缩放比例
-    this.heightZoomRate = 1;
-    // 将画布显示出来
-    tool.setCss(this.canvas, 'display', 'block');
-
     var winW = tool.getDocumentWidthHeight();
     if (this.isMobile) {
+      delete this.lineConfig.shadowBlur;
+      delete this.lineConfig.shadowColor;
       if (winW >= 768) {
         this.lineConfig.lineWidth = 8;
       } else if (winW < 768 && winW >= 414) {
@@ -265,6 +257,16 @@
         this.lineConfig.lineWidth = 2;
       }
     }
+
+    // 设置canvas画布的宽高
+    this.setCanvasWH(this.width, this.height);
+    this.widthOrigin = this.width;
+    this.heightOrigin = this.height;
+    this.widthZoomRate = 1; // 画布宽度缩放比例
+    this.heightZoomRate = 1;
+    // 将画布显示出来
+    tool.setCss(this.canvas, 'display', 'block');
+
 
     // 画布随浏览器窗口大小响应
     if (this.config.autoResize) {
