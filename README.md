@@ -1,23 +1,24 @@
 # Tablet
-Tablet是一个基于canvas的在线画板，内置精简版jQuery，无其他依赖，`传统网站`或`vue`、`react`、`angular`等单页面应用皆可使用！兼容各种移动设备！
+> Tablet是一个轻量级的基于canvas的在线画板，无其他依赖，`传统网站`或`vue`、`react`、`angular`等单页面应用皆可使用！兼容各种移动设备！
 
-Tablet is a canvas-based web page drawing board with a built-in simplified version of jQuery, 
-no other dependencies, and the operation steps can be withdrawn. It can be used on `traditional w
-ebsites` or single-page applications such as `vue`, `react`, and `angular`! 
-Compatible with various mobile devices!
+Tablet is a lightweight canvas-based online drawing board with no other dependencies. It can be used by `traditional websites` or single-page applications such as `vue`, `react`, and `angular`! Compatible with all kinds of mobile devices!
 
 ## canvas签名板文档
 这是<code>Tablet2.0</code>文档，Tablet1.0文档请前往 
 
 [Tablet1.0文档](https://github.com/941477276/Tablet/blob/master/README.md)
 
-## 安装
+## 安装(Install)
 1. **npm安装：**
 `npm install canvas-tablet -S`
 2. **script标签引入：**
-`将/dist/Table-2.0.1.min.js下载下来即可`
+`将/dist/Tablet-2.0.1.min.js下载下来即可`
 
-## 基本使用
+
+## 演示地址(Demo)
+### https://941477276.github.io/Tablet/index2.html
+
+## 基本使用(Usage)
 ```
 <div class="tool-bar">
   <div class="tablet-btns" style="padding: 10px;">
@@ -165,7 +166,7 @@ Compatible with various mobile devices!
   
   <div class="pt-20"></div>
 
-## 实例方法
+## 实例方法(Methods)
 > `refresh(refreshWH)`
 
 刷新画布，线条及背景将会重绘，返回当前Tablet实例；如果`refreshWH`为true，则会重新计算画布宽高
@@ -242,9 +243,3 @@ Compatible with various mobile devices!
 > `clear(clearPoints)`
 
   `clear`方法用于清空画布，返回值当前Tablet实例；如果`clearPoints`为true，则会将之前绘制的线条及操作步骤清空
- 
-
-
-## 演示地址
-
-### https://941477276.github.io/Tablet/index2.html
