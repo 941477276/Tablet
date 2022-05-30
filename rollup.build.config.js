@@ -6,7 +6,7 @@ export default {
     // 核心选项
     file: './dist/Tablet-2.0.min.js',    // 必须
     format: 'iife',  // 必须
-    name: 'Table'
+    name: 'Tablet'
   },
   plugins: [
     terser({ compress: { drop_console: true } })

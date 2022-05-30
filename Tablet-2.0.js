@@ -206,7 +206,7 @@
       lineWidthZoomRate: 1, // 画笔缩放比例，窗口大小改变后会改变
       lineCap: "round",
       lineJoin: "round",
-      shadowBlur: 1,
+      shadowBlur: 0, // 默认为0，如果开启了这个值会导致笔尖处缩小
       shadowColor: this.config.defaultColor
     };
     this.bgConfig = {
@@ -231,7 +231,7 @@
     this.operationRecords = []; // 操作记录
     // 旋转的角度
     this.degree = 0;
-    this.version = '2.0.4';
+    this.version = '2.0.5';
 
     if (typeof this.config.width === "function") {
       this.width = this.config.width();
@@ -245,16 +245,17 @@
     }
     var winW = tool.getDocumentWidthHeight();
     if (this.isMobile) {
-      delete this.lineConfig.shadowBlur;
-      delete this.lineConfig.shadowColor;
+      var lineConfig = this.lineConfig;
+      delete lineConfig.shadowBlur;
+      delete lineConfig.shadowColor;
       if (winW >= 768) {
-        this.lineConfig.lineWidth = 8;
+        lineConfig.lineWidth = 8;
       } else if (winW < 768 && winW >= 414) {
-        this.lineConfig.lineWidth = 6;
+        lineConfig.lineWidth = 6;
       } else if (winW < 414 && winW >= 375) {
-        this.lineConfig.lineWidth = 4;
+        lineConfig.lineWidth = 4;
       } else if (winW < 375 && winW >= 320) {
-        this.lineConfig.lineWidth = 2;
+        lineConfig.lineWidth = 2;
       }
     }
 
