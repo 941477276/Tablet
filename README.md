@@ -243,3 +243,14 @@ Tablet is a lightweight canvas-based online drawing board with no other dependen
 > `clear(clearPoints)`
 
   `clear`方法用于清空画布，返回值当前Tablet实例；如果`clearPoints`为true，则会将之前绘制的线条及操作步骤清空
+
+> `hasContent(singleColorCountMin, totalColorCountMin)` v2.0.5新增
+
+判断画布是否有内容，画布中有可用线条或画布中颜色数量大于等于`totalColorCountMin`都认为有内容
+
+1. `singleColorCountMin`：单个颜色最少数量，默认5
+2. `totalColorCountMin`：总颜色数量，默认为2
+
+> `getTabletImageColors` v2.0.5新增
+
+获取画布中内容的颜色（16进制）
