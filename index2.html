@@ -100,6 +100,9 @@
          <button type="button" class="backOneStep">撤回</button>
          <!--<button type="button" class="rotate" data-degree="90">旋转90度</button>-->
     </span>
+    <div>
+      <button type="button" id="getColors">获取图片颜色</button>
+    </div>
   </div>
 </div>
 
@@ -237,6 +240,9 @@
         $(".backOneStep").on('click', function () {
           that.revoke();
         });
+        $('#getColors').on('click', function () {
+          console.log(that.getTabletImageColors());
+        })
         /*$('.rotate').on('click', function () {
           that.rotate(this.dataset.degree);
           console.log(that);

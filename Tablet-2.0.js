@@ -1038,6 +1038,93 @@
     return obj;
   };
   /**
+   * 获取画布内容像素颜色
+   * @returns {{}}
+   */
+  Tablet.prototype.getTabletImageColors = function () {
+    // 获取像素数据
+    // let data = this.getImageData();
+    var data = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+    console.log('data', data);
+    var hexCache = {};
+    var toHex = function (a) {
+      if (a in hexCache) {
+        return hexCache[a];
+      }
+      var hex = a.toString(16);
+      if (hex.length == 1) {
+        hex = "0" + hex;
+      } else {
+        hex = hex;
+      }
+      hexCache[a] = hex;
+      return hex;
+    };
+
+    var colorCache = {};
+    var toColor = function (r, g, b, a) {
+      var prop = r + '_' + g + '_' + b + '_' + a;
+      if (prop in colorCache) {
+        return colorCache[prop];
+      }
+      var s = [];
+      s.push(toHex(r));
+      s.push(toHex(g));
+      s.push(toHex(b));
+      s.push(toHex(a));
+      var color = s.join('');
+      colorCache[prop] = color;
+      console.log('color, alpha', color, Math.round(a / 255 * 100) / 100);
+      return color;
+    }
+
+    var map = {};
+    for (var i = 0; i < data.length; i += 4) {
+      var r = data[i];
+      var g = data[i + 1];
+      var b = data[i + 2];
+      var a = data[i + 3];
+      var c = toColor(r, g, b, a);
+
+      if (map[c]) {
+        map[c]++;
+      } else {
+        map[c] = 1;
+      }
+    }
+    return map;
+  };
+
+  /**
+   * 判断画布中是否有内容
+   * @param singleColorCountMin 单个颜色最少数量，默认5
+   * @param totalColorCountMin 总颜色数量，默认为2
+   * @returns {boolean}
+   */
+  Tablet.prototype.hasContent = function (singleColorCountMin, totalColorCountMin) {
+    var hasCanUseLine = this.hasCanUseLine();
+    var colors = this.getTabletImageColors();
+    if (!singleColorCountMin) {
+      singleColorCountMin = 5;
+    }
+    if (!totalColorCountMin) {
+      totalColorCountMin = 2;
+    }
+    if (!hasCanUseLine) {
+      var filteredColors = {};
+      var filteredColorCount = 0;
+      for (var color in colors) {
+        var count = colors[color];
+        if (count > singleColorCountMin) {
+          filteredColors[color] = count;
+          filteredColorCount++;
+        }
+      }
+      return filteredColorCount >= totalColorCountMin;
+    }
+    return true;
+  };
+  /**
    * 销毁画布
    */
   Tablet.prototype.destroy = function () {
