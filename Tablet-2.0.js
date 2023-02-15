@@ -417,33 +417,13 @@
     var event = "resize";
     var that = this;
     var lastUpdateTime = 0;
-    var tabletLastWidth = this.width;
-    var tabletLastHeight = this.height;
     event += window.onorientationchange ? " orientationchange" : "";
     console.log('resize event');
     var eventFn = function () {
       var now = new Date().getTime();
       if (lastUpdateTime == 0 || (now - lastUpdateTime) > 100) {
         lastUpdateTime = now;
-        var tablet = that.tabletEl,
-          bl = parseFloat(tool.getStyle(tablet, 'border-left-width')),
-          br = parseFloat(tool.getStyle(tablet, 'border-right-width')),
-          bt = parseFloat(tool.getStyle(tablet, 'border-top-width')),
-          bb = parseFloat(tool.getStyle(tablet, 'border-bottom-width')),
-          pl = parseFloat(tool.getStyle(tablet, 'padding-left')),
-          pr = parseFloat(tool.getStyle(tablet, 'padding-right')),
-          pt = parseFloat(tool.getStyle(tablet, 'padding-top')),
-          pb = parseFloat(tool.getStyle(tablet, 'padding-bottom'));
-        var tabletW = tablet.offsetWidth - bl - br - pl - pr;
-        var tabletH = tablet.offsetHeight - bt - bb - pt - pb;
-        if (tabletLastWidth == tabletW && tabletLastWidth == tabletH) {
-          console.info('container width not changed!');
-          return;
-        }
         console.log('浏览器宽高改变了，重新绘制');
-
-        tabletLastWidth = tabletW;
-        tabletLastHeight = tabletH;
         that.setCanvasWH();
 
         // that.ctx.save(); // 先保存主画布的状态
@@ -733,27 +713,26 @@
    */
   Tablet.prototype.setCanvasWH = function (width, height) {
     if (!width || !height) { // 如果外部没有传递宽高，则取画布元素的宽高
-      var tablet = this.tabletEl;
-      var bl = parseFloat(tool.getStyle(tablet, 'border-left-width')),
-        br = parseFloat(tool.getStyle(tablet, 'border-right-width')),
-        bt = parseFloat(tool.getStyle(tablet, 'border-top-width')),
-        bb = parseFloat(tool.getStyle(tablet, 'border-bottom-width')),
-        pl = parseFloat(tool.getStyle(tablet, 'padding-left')),
-        pr = parseFloat(tool.getStyle(tablet, 'padding-right')),
-        pt = parseFloat(tool.getStyle(tablet, 'padding-top')),
-        pb = parseFloat(tool.getStyle(tablet, 'padding-bottom'));
-      this.width = tablet.offsetWidth - bl - br - pl - pr;
-      this.height = tablet.offsetHeight - bt - bb - pt - pb;
-      if (this.width <= 0) { // 如果画布没有宽度，则取画布父级元素的宽度
-        this.width = this.container.offsetWidth;
+      var container = this.container;
+      var bl = parseFloat(tool.getStyle(container, 'border-left-width')),
+        br = parseFloat(tool.getStyle(container, 'border-right-width')),
+        bt = parseFloat(tool.getStyle(container, 'border-top-width')),
+        bb = parseFloat(tool.getStyle(container, 'border-bottom-width')),
+        pl = parseFloat(tool.getStyle(container, 'padding-left')),
+        pr = parseFloat(tool.getStyle(container, 'padding-right')),
+        pt = parseFloat(tool.getStyle(container, 'padding-top')),
+        pb = parseFloat(tool.getStyle(container, 'padding-bottom'));
+      var newWidth = container.offsetWidth - bl - br - pl - pr;
+      var newHeight = container.offsetHeight - bt - bb - pt - pb;
+      if (newWidth == this.width && newHeight == this.height) {
+        return this;
       }
-      if (this.height <= 0) { // 如果画布没有高度，则取画布父级元素的高度
-        this.height = this.container.offsetHeight;
-        if (this.height <= 0) {
-          this.height = this.config.defaultHeight;
-        }
-      }
+      this.width = container.offsetWidth - bl - br - pl - pr;
+      this.height = container.offsetHeight - bt - bb - pt - pb;
     } else {
+      if (width == this.width && height == this.height) {
+        return this;
+      }
       this.width = width;
       this.height = height;
     }
