@@ -243,7 +243,7 @@
     this.operationRecords = []; // 操作记录
     // 旋转的角度
     this.degree = 0;
-    this.version = '2.0.5';
+    this.version = '2.0.6';
 
     if (typeof this.config.width === "function") {
       this.width = this.config.width();

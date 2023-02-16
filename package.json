@@ -1,6 +1,6 @@
 {
   "name": "canvas-tablet",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Tablet是一个轻量级的基于canvas的在线画板，无其他依赖，`传统网站`或`vue`、`react`、`angular`等单页面应用皆可使用！兼容各种移动设备！",
   "main": "dist/Tablet-2.0.min.js",
   "scripts": {
