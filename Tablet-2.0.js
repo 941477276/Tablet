@@ -218,12 +218,24 @@
       width: -1,
       height: -1
     };
-    this.container.appendChild(this.buildTablet());
-    var tabletEl = this.tabletEl = document.getElementById(this.id);
+    var tabletEl = document.createElement('div');
+    tabletEl.className = 'yn-canvas-tablet';
+    tabletEl.id = this.id;
+    var canvas = document.createElement('canvas');
+    canvas.className = 'yn-tablet-canvas';
+    canvas.style.cursor = 'crosshair';
+    canvas.style.display = 'none';
+    var canvasBackup = document.createElement('canvas');
+    canvasBackup.className = 'yn-tablet-backup-canvas';
+    canvasBackup.style.display = 'none';
 
-    this.canvas = tabletEl.querySelector('.tablet-canvas');
+    tabletEl.appendChild(canvas);
+    tabletEl.appendChild(canvasBackup);
+    this.container.appendChild(tabletEl);
+
+    this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
-    this.canvasBack = tabletEl.querySelector('.backup-canvas');
+    this.canvasBack = canvasBackup;
     this.ctxBack = this.canvasBack.getContext("2d");
     // 用于记录当前绘制的坐标
     this.point = { x: 0, y: 0 };
@@ -974,26 +986,6 @@
       u8arr[len] = bStr.charCodeAt(len);
     }
     return new Blob([u8arr], { type: mime });
-  };
-  /*
-      生成前面板html
-  */
-  Tablet.prototype.buildTablet = function () {
-    var html = '',
-      flex = '',
-      tempDiv = document.createElement('div');
-    /*if (this.isMobile) {
-      flex = 'flex ';
-    }*/
-    html += '<div class="-tablet ' + flex + this.config.extraClass + '" id="' + this.id + '">';
-    html += '    <div class="-canvas-wrapper">';
-    html += '        <canvas class="tablet-canvas" style="cursor: crosshair;display: none;"></canvas>'; // 默认隐藏画布，以方便在初始化时好获取高度
-    html += '        <canvas class="backup-canvas" style="display: none;"></canvas>';
-    html += '    </div>';
-    html += '</div>';
-    tempDiv.innerHTML = html;
-
-    return tempDiv.firstChild;
   };
   /**
    *  获取x、y轴的最大、最小值，并返回一个对象
